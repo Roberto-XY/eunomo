@@ -1,3 +1,4 @@
+# Elixir
 /_build
 /cover
 /deps
@@ -8,3 +9,9 @@ erl_crash.dump
 *.beam
 /config/*.secret.exs
 .elixir_ls/
+eunomo-*.tar
+
+# User
+notes
+notes.exs
+test/phoenix
