@@ -8,6 +8,11 @@ defmodule Eunomo.MixProject do
       elixir: ">= 1.7.4",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      dialyzer: [
+        plt_add_deps: :transitive,
+        plt_add_apps: [:mix],
+        plt_file: {:no_warn, "plts/eunomo.plt"}
+      ],
       aliases: aliases(),
       package: package()
     ]
@@ -15,6 +20,7 @@ defmodule Eunomo.MixProject do
 
   defp package do
     [
+      description: "Elixir `alias` and `import` sorter.",
       files: [
         ".eunomo.exs",
         "lib",

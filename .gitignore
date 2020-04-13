@@ -11,6 +11,11 @@ erl_crash.dump
 .elixir_ls/
 eunomo-*.tar
 
+# Dialyzer PLTs
+plts/
+*.plt
+*.plt.hash
+
 # User
 notes
 notes.exs
