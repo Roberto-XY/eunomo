@@ -1,12 +1,28 @@
 defmodule Mix.Tasks.Eunomo.Gen.Config do
+  @config_filename ".eunomo.exs"
+  @generated_file """
+  # Used by "mix eunomo"
+  [
+    inputs: :read_from_dot_formatter,
+    formatter: [
+      Eunomo.Formatter.AlphabeticalAliasSorter,
+      Eunomo.Formatter.AlphabeticalImportSorter
+    ]
+  ]
+  """
+
   @moduledoc """
   Generates the default configuration for `Eunomo`.
 
-  The `.eunomo.ex` file is created in the current working directory.
-  """
-  use Mix.Task
+  The `#{@config_filename}` file is created in the current working directory. If it already exists
+  the task is aborted.
 
-  @config_filename ".eunomo.exs"
+  ```elixir
+  #{@generated_file}
+  ```
+  """
+
+  use Mix.Task
 
   @impl true
   def run(_args) do
@@ -26,16 +42,7 @@ defmodule Mix.Tasks.Eunomo.Gen.Config do
 
       File.write!(
         Path.join(File.cwd!(), @config_filename),
-        """
-        # Used by "mix eunomo"
-        [
-          inputs: :read_from_dot_formatter,
-          formatter: [
-            Eunomo.Formatter.AlphabeticalAliasSorter,
-            Eunomo.Formatter.AlphabeticalImportSorter
-          ]
-        ]
-        """
+        @generated_file
       )
     end
   end
