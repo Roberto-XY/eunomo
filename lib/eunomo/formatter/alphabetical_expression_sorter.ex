@@ -72,7 +72,7 @@ defmodule Eunomo.Formatter.AlphabeticalExpressionSorter do
 
   @typep modifications :: %{optional(LineMap.line_number()) => LineMap.line_number()}
 
-  @spec ast_block_to_modifications({:__block__, Macro.meta(), [Macro.t()]}, atom) ::
+  @spec ast_block_to_modifications({:__block__, Macro.metadata(), [Macro.t()]}, atom) ::
           modifications()
   defp ast_block_to_modifications({:__block__, _, args}, split_expression) do
     args
@@ -82,7 +82,7 @@ defmodule Eunomo.Formatter.AlphabeticalExpressionSorter do
   end
 
   # Takes all sorted expression blocks and transforms them into concrete line changes.
-  @spec accumulate_modifications([Macro.t()], atom) :: modifications()
+  @spec accumulate_modifications([Macro.t()], atom) :: modifications
   defp accumulate_modifications(expression_blocks, split_expression) do
     Enum.reduce(expression_blocks, %{}, fn expression_block, acc ->
       first_line =
@@ -92,8 +92,7 @@ defmodule Eunomo.Formatter.AlphabeticalExpressionSorter do
         end)
         |> Enum.min(fn -> 0 end)
 
-      {inner_acc, _} =
-        expression_block_to_modification(expression_block, first_line, split_expression)
+      inner_acc = expression_block_to_modification(expression_block, first_line, split_expression)
 
       Map.merge(acc, inner_acc, fn _, _, _ -> raise LineModificationConflict end)
     end)
@@ -102,24 +101,28 @@ defmodule Eunomo.Formatter.AlphabeticalExpressionSorter do
   # Takes a sorted expression block and moves it to the `start_line`. The `start_line` == the
   # original start of the block. So only lines _within_ a block are shuffled but the blocks them
   # selves remain static in the file layout.
-  @spec expression_block_to_modification(Macro.t(), non_neg_integer, atom) :: modifications()
+  @spec expression_block_to_modification(Macro.t(), non_neg_integer, atom) :: modifications
   defp expression_block_to_modification(expression_block, start_line, split_expression) do
-    Enum.reduce(expression_block, {%{}, start_line}, fn {^split_expression, meta, _},
-                                                        {acc, current_line} ->
-      from = Keyword.fetch!(meta, :line)
-      to = meta |> Keyword.get(:end_of_expression, line: from) |> Keyword.fetch!(:line)
+    {acc, _} =
+      Enum.reduce(expression_block, {%{}, start_line}, fn {^split_expression, meta, _},
+                                                          {acc, current_line} ->
+        from = Keyword.fetch!(meta, :line)
+        to = meta |> Keyword.get(:end_of_expression, line: from) |> Keyword.fetch!(:line)
 
-      {inner_acc, current_line} = range_to_modification(from..to, current_line)
+        {inner_acc, current_line} = range_to_modification(from..to, current_line)
 
-      acc = Map.merge(acc, inner_acc, fn _, _, _ -> raise LineModificationConflict end)
+        acc = Map.merge(acc, inner_acc, fn _, _, _ -> raise LineModificationConflict end)
 
-      {acc, current_line}
-    end)
+        {acc, current_line}
+      end)
+
+    acc
   end
 
   # Takes a range and a start line and creates a mapping from each line in the range to start
-  # line. e.g. 2..3, 5 -> %{2 => 5, 3 => 6}
-  @spec range_to_modification(Range.t(), non_neg_integer) :: modifications()
+  # line. e.g. 2..3, 5 -> %{2 => 5, 3 => 6} & the last new line number
+  @spec range_to_modification(Range.t(), non_neg_integer) ::
+          {modifications, LineMap.line_number()}
   defp range_to_modification(block_range, start_line) do
     Enum.reduce(block_range, {%{}, start_line}, fn old_line_number, {acc, new_line_number} ->
       acc = Map.put(acc, old_line_number, new_line_number)
