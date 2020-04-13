@@ -5,10 +5,27 @@ defmodule Eunomo.MixProject do
     [
       app: :eunomo,
       version: "0.1.0",
-      elixir: "~> 1.10",
+      elixir: ">= 1.7.4",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases()
+    ]
+  end
+
+  defp package do
+    [
+      files: [
+        ".eunomo.exs",
+        "lib",
+        "LICENSE.md",
+        "mix.exs",
+        "README.md"
+      ],
+      maintainers: ["A. Roberto Fischer"],
+      licenses: ["Apache-2.0"],
+      links: %{
+        "GitHub" => "https://github.com/Roberto-XY/eunomo"
+      }
     ]
   end
 

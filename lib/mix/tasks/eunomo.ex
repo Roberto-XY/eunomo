@@ -107,18 +107,18 @@ defmodule Mix.Tasks.Eunomo do
   end
 
   defp check!({[{:exit, :stdin, exception, stacktrace} | _], _not_formatted}) do
-    Mix.shell().error("mix format failed for stdin")
+    Mix.shell().error("mix eunomo failed for stdin")
     reraise exception, stacktrace
   end
 
   defp check!({[{:exit, file, exception, stacktrace} | _], _not_formatted}) do
-    Mix.shell().error("mix format failed for file: #{Path.relative_to_cwd(file)}")
+    Mix.shell().error("mix eunomo failed for file: #{Path.relative_to_cwd(file)}")
     reraise exception, stacktrace
   end
 
   defp check!({_exits, [_ | _] = not_formatted}) do
     Mix.raise("""
-    mix format failed due to --check-formatted.
+    mix eunomo failed due to --check-formatted.
     The following files were not formatted:
     #{to_bullet_list(not_formatted)}
     """)

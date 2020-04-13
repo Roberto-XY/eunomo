@@ -7,7 +7,8 @@ defmodule Eunomo.Formatter.AlphabeticalAliasSorter do
   other non-alias expressions.
 
   Only the order of lines is modified by this formatter. Neither the overall number of lines nor
-  the content of a single line will change.
+  the content of a single line will change. This means that multi-aliases are not internally
+  sorted i.e. `Hello.{World, Earth}` does _not_ become `Hello.{Earth, World}`.
 
   ## Examples
 
@@ -39,8 +40,8 @@ defmodule Eunomo.Formatter.AlphabeticalAliasSorter do
 
   @behaviour Eunomo.Formatter
 
-  alias Eunomo.LineMap
   alias Eunomo.Formatter.AlphabeticalExpressionSorter
+  alias Eunomo.LineMap
 
   @impl true
   @spec format(LineMap.t()) :: LineMap.t()
