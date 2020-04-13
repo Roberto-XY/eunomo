@@ -5,11 +5,9 @@ jobs:
     name: Eunomo (Elixir ${{ matrix.elixir }} OTP ${{ matrix.otp }})
     strategy:
       matrix:
-        elixir: ['1.7.4', '1.10.1']
+        elixir: ['1.10.2']
         include:
-          - elixir: '1.7.4'
-            otp: '19.x'
-          - elixir: '1.10.1'
+          - elixir: '1.10.2'
             otp: '22.x'
     runs-on: ubuntu-16.04
     steps:
@@ -23,8 +21,8 @@ jobs:
           uses: actions/cache@v1
           with:
             path: deps
-            key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-            restore-keys: ${{ runner.os }}-mix-
+            key: ${{ runner.os }}-${{ matrix.elixir }}--mix-${{ hashFiles('**/mix.lock') }}
+            restore-keys: ${{ runner.os }}-${{ matrix.elixir }}-mix-
 
         - name: Cache dialyzer plt
           uses: actions/cache@v1
