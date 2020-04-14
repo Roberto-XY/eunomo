@@ -5,11 +5,11 @@ jobs:
     name: Eunomo (Elixir ${{ matrix.elixir }} OTP ${{ matrix.otp }})
     strategy:
       matrix:
-        elixir: ['1.8.0', '1.9.0', '1.10.2']
+        elixir: ['1.10.0', '1.10.1', '1.10.2']
         include:
-          - elixir: '1.8.0'
+          - elixir: '1.10.0'
             otp: '22.x'
-          - elixir: '1.9.0'
+          - elixir: '1.10.1'
             otp: '22.x'
           - elixir: '1.10.2'
             otp: '22.x'
