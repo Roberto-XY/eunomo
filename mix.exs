@@ -4,7 +4,7 @@ defmodule Eunomo.MixProject do
   def project do
     [
       app: :eunomo,
-      version: "0.1.0",
+      version: "0.1.1",
       elixir: ">= 1.10.0",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -20,7 +20,7 @@ defmodule Eunomo.MixProject do
 
   defp package do
     [
-      description: "Elixir `alias` and `import` sorter.",
+      description: "Elixir `alias`, `import` and require sorter.",
       files: [
         ".eunomo.exs",
         "lib",
