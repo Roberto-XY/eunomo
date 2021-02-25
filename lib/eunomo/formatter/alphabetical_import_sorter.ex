@@ -3,7 +3,7 @@ defmodule Eunomo.Formatter.AlphabeticalImportSorter do
   Sorts `import` definitions alphabetically.
 
   The sorting does not happen globally. Instead each "import block" is sorted separately. An
-  "import import" is a set of `import` expressions that are _not_ separated by at least one empty
+  "import block" is a set of `import` expressions that are _not_ separated by at least one empty
   newline or other non-import expressions.
 
   Only the order of lines is modified by this formatter. Neither the overall number of lines nor
