@@ -20,7 +20,7 @@ defmodule Eunomo.MixProject do
 
   defp package do
     [
-      description: "Elixir `alias` and `import` sorter.",
+      description: "Elixir `alias`, `import` and `require` sorter.",
       files: [
         ".eunomo.exs",
         "lib",

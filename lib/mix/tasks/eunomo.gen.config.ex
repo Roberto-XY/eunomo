@@ -6,7 +6,8 @@ defmodule Mix.Tasks.Eunomo.Gen.Config do
     inputs: :read_from_dot_formatter,
     formatter: [
       Eunomo.Formatter.AlphabeticalAliasSorter,
-      Eunomo.Formatter.AlphabeticalImportSorter
+      Eunomo.Formatter.AlphabeticalImportSorter,
+      Eunomo.Formatter.AlphabeticalRequireSorter
     ]
   ]
   """
