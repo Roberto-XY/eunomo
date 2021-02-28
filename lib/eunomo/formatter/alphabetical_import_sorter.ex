@@ -21,7 +21,9 @@ defmodule Eunomo.Formatter.AlphabeticalImportSorter do
       ...> }
       ...> import Eunomo.C
       ...> import B, expect: [callback: 1]
-      ...> \\nimport A
+      ...> \\nimport Eunomo.PG.Repo
+      ...> import A
+      ...> import Eunomo.Patient
       ...> \"\"\"
       ...> Eunomo.format_string(code_snippet, [Eunomo.Formatter.AlphabeticalImportSorter])
       \"\"\"
@@ -35,6 +37,8 @@ defmodule Eunomo.Formatter.AlphabeticalImportSorter do
         # test
       }
       \\nimport A
+      import Eunomo.Patient
+      import Eunomo.PG.Repo
       \"\"\"
 
   """
