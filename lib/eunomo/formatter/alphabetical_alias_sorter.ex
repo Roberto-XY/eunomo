@@ -21,7 +21,9 @@ defmodule Eunomo.Formatter.AlphabeticalAliasSorter do
       ...>   # test
       ...> }
       ...> alias Eunomo.C
-      ...> \\nalias A
+      ...> \\nalias Eunomo.PG.Repo
+      ...> alias A
+      ...> alias Eunomo.Patient
       ...> \"\"\"
       ...> Eunomo.format_string(code_snippet, [Eunomo.Formatter.AlphabeticalAliasSorter])
       \"\"\"
@@ -34,6 +36,8 @@ defmodule Eunomo.Formatter.AlphabeticalAliasSorter do
         # test
       }
       \\nalias A
+      alias Eunomo.Patient
+      alias Eunomo.PG.Repo
       \"\"\"
 
   """

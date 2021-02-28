@@ -25,11 +25,6 @@ defmodule Eunomo.Formatter do
     end)
   end
 
-  @doc """
-  Applies the given implementation module to the `Eunomo.LineMap`.
-
-  Returns the modified `Eunomo.LineMap`.
-  """
   @spec format(LineMap.t(), module) :: LineMap.t()
   def format(line_map, implementation) when is_map(line_map) and is_atom(implementation) do
     implementation.format(line_map)
