@@ -77,7 +77,7 @@ defmodule Eunomo.Formatter.AlphabeticalExpressionSorter do
   defp ast_block_to_modifications({:__block__, _, args}, split_expression) do
     args
     |> split_into_expression_blocks(split_expression)
-    |> Enum.map(&Enum.sort_by(&1, fn t -> Macro.to_string(t) end))
+    |> Enum.map(&Enum.sort_by(&1, fn t -> t |> Macro.to_string() |> String.upcase() end))
     |> accumulate_modifications(split_expression)
   end
 
