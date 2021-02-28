@@ -21,7 +21,9 @@ defmodule Eunomo.Formatter.AlphabeticalRequireSorter do
       ...>   # test
       ...> }
       ...> require Eunomo.C
-      ...> \\nrequire A
+      ...> \\nrequire Eunomo.PG.Repo
+      ...> require A
+      ...> require Eunomo.Patient
       ...> \"\"\"
       ...> Eunomo.format_string(code_snippet, [Eunomo.Formatter.AlphabeticalRequireSorter])
       \"\"\"
@@ -34,6 +36,8 @@ defmodule Eunomo.Formatter.AlphabeticalRequireSorter do
         # test
       }
       \\nrequire A
+      require Eunomo.Patient
+      require Eunomo.PG.Repo
       \"\"\"
 
   """
