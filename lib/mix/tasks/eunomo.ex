@@ -4,7 +4,7 @@ defmodule Mix.Tasks.Eunomo do
 
   The default Elixir formatter has the philosophy of not modifying non metadata parts of the AST.
   `Eunomo` does not adhere to this philosophy and is meant to be used as an extension to the
-  default formatter. As of now the use case is to sort `import`, `alias` and require definitions
+  default formatter. As of now the use case is to sort `import`, `alias` and `require` definitions
   alphabetically.
 
   To make usage more seamless it is recommended to define an alias in `mix.exs`. For example:
