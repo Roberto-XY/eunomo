@@ -35,8 +35,8 @@ jobs:
         uses: actions/cache@v2
         with:
           path: plts
-          key: ${{ runner.os }}-${{ matrix.elixir }}-dialyzer
-          restore-keys: ${{ runner.os }}-${{ matrix.elixir }}-dialyzer
+          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-dialyzer
+          restore-keys: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-dialyzer
 
       - name: Install Dependencies
         run: mix deps.get
