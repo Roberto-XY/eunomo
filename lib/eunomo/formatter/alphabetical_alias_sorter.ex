@@ -15,6 +15,8 @@ defmodule Eunomo.Formatter.AlphabeticalAliasSorter do
       iex> code_snippet = \"\"\"
       ...> alias Eunomo.Z.{L, I}
       ...> alias Eunomo.Z
+      ...> alias __MODULE__.B
+      ...> alias __MODULE__.A
       ...> alias Eunomo.{
       ...>   L,
       ...>   B,
@@ -27,6 +29,8 @@ defmodule Eunomo.Formatter.AlphabeticalAliasSorter do
       ...> \"\"\"
       ...> Eunomo.format_string(code_snippet, [Eunomo.Formatter.AlphabeticalAliasSorter])
       \"\"\"
+      alias __MODULE__.A
+      alias __MODULE__.B
       alias Eunomo.C
       alias Eunomo.Z
       alias Eunomo.Z.{L, I}
