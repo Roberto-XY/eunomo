@@ -4,8 +4,8 @@ defmodule Eunomo.MixProject do
   def project do
     [
       app: :eunomo,
-      version: "0.1.3",
-      elixir: ">= 1.10.0",
+      version: "1.0.0",
+      elixir: ">= 1.13.0",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       dialyzer: [
