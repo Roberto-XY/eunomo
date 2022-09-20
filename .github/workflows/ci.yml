@@ -11,8 +11,11 @@ jobs:
     name: Eunomo (Elixir ${{ matrix.elixir }} OTP ${{ matrix.otp }})
     strategy:
       matrix:
-        otp: ["22.x", "25.x"]
-        elixir: ["1.10.0", "1.14.0"]
+        include:
+          - otp: "22.x"
+            elixir: "1.10.0"
+          - otp: "25.x"
+            elixir: "1.14.0"
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
