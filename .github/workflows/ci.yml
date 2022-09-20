@@ -11,15 +11,19 @@ jobs:
     name: Eunomo (Elixir ${{ matrix.elixir }} OTP ${{ matrix.otp }})
     strategy:
       matrix:
-        otp: ["22.x", "23.x"]
-        elixir: ["1.10.4", "1.11.3"]
-        exclude:
-          - elixir: "1.10.4"
-            otp: "23.x"
+        include:
+          - otp: "22.x"
+            elixir: "1.13.0"
+          - otp: "25.x"
+            elixir: "1.13.4"
+          - otp: "23.x"
+            elixir: "1.14.0"
+          - otp: "25.x"
+            elixir: "1.14.0"
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - uses: erlef/setup-elixir@v1
+      - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
@@ -57,4 +61,4 @@ jobs:
         run: mix test
 
       - name: Run dialyzer
-        run: mkdir -p plts && mix dialyzer --halt-exit-status
+        run: mkdir -p plts && mix dialyzer
