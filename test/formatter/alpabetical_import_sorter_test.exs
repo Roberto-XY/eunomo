@@ -1,4 +1,4 @@
-defmodule AlphabeticalImportSorterTest do
+defmodule ImportSorterTest do
   use ExUnit.Case
-  doctest Eunomo.Formatter.AlphabeticalImportSorter
+  doctest Eunomo.ImportSorter
 end

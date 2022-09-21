@@ -1,21 +1,13 @@
 defmodule Eunomo do
   @moduledoc false
 
-  alias Eunomo.Formatter
-  alias Eunomo.LineMap
-
-  @doc """
-  Applies the given `Eunomo.Formatter`s to the file.
-
-  See `Mix.Tasks.Eunomo` for opts.
-  """
   @spec format_file(Path.t(), [module], Keyword.t()) ::
           :ok | {:exit, Path.t(), Exception.t(), any}
   def format_file(path, formatters, opts \\ [])
       when is_binary(path) and is_list(formatters) and is_list(opts) do
     input = File.read!(path)
 
-    output = format_string(input, formatters, opts)
+    output = format(input, formatters)
 
     check_formatted? = Keyword.get(opts, :check_formatted, false)
     dry_run? = Keyword.get(opts, :dry_run, false)
@@ -38,17 +30,10 @@ defmodule Eunomo do
       {:exit, path, exception, __STACKTRACE__}
   end
 
-  @doc """
-  Applies the given `Eunomo.Formatter`s to the file.
-
-  See `Mix.Tasks.Eunomo` for opts.
-  """
-  @spec format_string(String.t(), [module], Keyword.t()) :: String.t()
-  def format_string(input, formatters, opts \\ [])
-      when is_binary(input) and is_list(formatters) and is_list(opts) do
-    input
-    |> LineMap.from_code_string()
-    |> Formatter.format(formatters)
-    |> LineMap.to_code_string()
+  @spec format(String.t(), [module]) :: String.t()
+  def format(contents, implementations) when is_binary(contents) and is_list(implementations) do
+    Enum.reduce(implementations, contents, fn implementation, contents ->
+      implementation.format(contents, [])
+    end)
   end
 end

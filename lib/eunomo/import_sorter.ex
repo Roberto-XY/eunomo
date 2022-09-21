@@ -1,4 +1,4 @@
-defmodule Eunomo.Formatter.AlphabeticalImportSorter do
+defmodule Eunomo.ImportSorter do
   @moduledoc """
   Sorts `import` definitions alphabetically.
 
@@ -25,7 +25,7 @@ defmodule Eunomo.Formatter.AlphabeticalImportSorter do
       ...> import A
       ...> import Eunomo.Patient
       ...> \"\"\"
-      ...> Eunomo.format_string(code_snippet, [Eunomo.Formatter.AlphabeticalImportSorter])
+      ...> Eunomo.ImportSorter.format(code_snippet, [])
       \"\"\"
       import B, expect: [callback: 1]
       import Eunomo.C
@@ -43,14 +43,23 @@ defmodule Eunomo.Formatter.AlphabeticalImportSorter do
 
   """
 
-  @behaviour Eunomo.Formatter
+  @behaviour Mix.Tasks.Format
 
-  alias Eunomo.Formatter.AlphabeticalExpressionSorter
+  alias Eunomo.ExpressionSorter
   alias Eunomo.LineMap
 
   @impl true
-  @spec format(LineMap.t()) :: LineMap.t()
-  def format(line_map) when is_map(line_map) do
-    AlphabeticalExpressionSorter.format(line_map, :import)
+  @spec features(Keyword.t()) :: [sigils: [atom()], extensions: [binary()]]
+  def features(_opts) do
+    [extensions: [".ex", ".exs"]]
+  end
+
+  @impl true
+  @spec format(String.t(), Keyword.t()) :: String.t()
+  def format(contents, _opts) do
+    contents
+    |> LineMap.from_code_string()
+    |> ExpressionSorter.format(:import)
+    |> LineMap.to_code_string()
   end
 end

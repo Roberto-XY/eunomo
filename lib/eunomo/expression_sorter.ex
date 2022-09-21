@@ -1,7 +1,8 @@
-defmodule Eunomo.Formatter.AlphabeticalExpressionSorter do
+defmodule Eunomo.ExpressionSorter do
   @moduledoc false
 
-  # This module is only meant to be used for alias & import expressions!
+  # Sorts expressions alphabetically.
+  # This module is only meant to be used for alias, import & require expressions!
 
   alias Eunomo.LineMap
 
@@ -10,7 +11,7 @@ defmodule Eunomo.Formatter.AlphabeticalExpressionSorter do
 
     defexception message: """
                    Please report a bug.
-                   Same line got mapped twice in `Eunomo.Formatter.AlphabeticalExpressionSorter`.
+                   Same line got mapped twice in `Eunomo.ExpressionSorter`.
                  """
   end
 

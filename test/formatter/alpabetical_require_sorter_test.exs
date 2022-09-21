@@ -1,4 +1,4 @@
-defmodule AlphabeticalRequireSorterTest do
+defmodule RequireSorterTest do
   use ExUnit.Case
-  doctest Eunomo.Formatter.AlphabeticalRequireSorter
+  doctest Eunomo.RequireSorter
 end

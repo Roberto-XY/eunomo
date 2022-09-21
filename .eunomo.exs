@@ -1,9 +1,9 @@
-# Used by "mix eunomo"
+# Used by "mix eunomo" with Elixir `< 1.13.0`
 [
   inputs: :read_from_dot_formatter,
   formatter: [
-    Eunomo.Formatter.AlphabeticalAliasSorter,
-    Eunomo.Formatter.AlphabeticalImportSorter,
-    Eunomo.Formatter.AlphabeticalRequireSorter
+    Eunomo.AliasSorter,
+    Eunomo.ImportSorter,
+    Eunomo.RequireSorter
   ]
 ]

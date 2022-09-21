@@ -1,10 +1,18 @@
 defmodule Mix.Tasks.Eunomo do
+  use Mix.Task
+
+  @shortdoc "Formats the given files/patterns. NOTE: Usage only recommended for Elixir version `< 1.13.0`!"
+
   @moduledoc """
-  Formats the given files/patterns.
+  #{@shortdoc}
+
+  For `>= 1.13.0` the formatter comes with a [plugin
+  system](https://hexdocs.pm/mix/1.13.0/Mix.Tasks.Format.html#module-plugins). You should use that
+  instead, see the `.formatter.exs` file in this repo for an example usage.
 
   The default Elixir formatter has the philosophy of not modifying non metadata parts of the AST.
-  `Eunomo` does not adhere to this philosophy and is meant to be used as an extension to the
-  default formatter. As of now the use case is to sort `import`, `alias` and `require` definitions
+  `Eunomo` does not adhere to this philosophy and is meant to be used as an extension to the default
+  formatter. As of now the use case is to sort `import`, `alias` and `require` definitions
   alphabetically.
 
   To make usage more seamless it is recommended to define an alias in `mix.exs`. For example:
@@ -33,18 +41,17 @@ defmodule Mix.Tasks.Eunomo do
     - `:inputs` - List of paths and patterns to be formatted. By default the atom
       `:read_from_dot_formatter` is passed which will read all `:inputs` from `.formatter.exs`.
 
-    - `:formatter` - List of modules that implement the `Eunomo.Formatter` behaviour. They are
-      applied sequentially to all matched files.
+    - `:formatter` - List of modules that implement the `Eunomo` behaviour. They are applied
+      sequentially to all matched files.
 
   ## Task-specific options
 
-    - `--check-formatted` - checks that the file is already formatted. This is useful in
-      pre-commit hooks and CI scripts if you want to reject contributions with unformatted code.
+    - `--check-formatted` - checks that the file is already formatted. This is useful in pre-commit
+      hooks and CI scripts if you want to reject contributions with unformatted code.
 
     - `--dry-run` - does not save files after formatting.
 
   """
-  use Mix.Task
 
   @switches [
     check_formatted: :boolean,
@@ -72,8 +79,8 @@ defmodule Mix.Tasks.Eunomo do
       |> Enum.map(&expand_relative_to_cwd/1)
     end)
     |> Task.async_stream(
-      fn file ->
-        Eunomo.format_file(file, dot_eunomo[:formatter], opts)
+      fn path ->
+        Eunomo.format_file(path, dot_eunomo[:formatter], opts)
       end,
       ordered: false,
       timeout: 30_000

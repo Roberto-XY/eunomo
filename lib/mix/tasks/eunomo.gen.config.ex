@@ -1,19 +1,26 @@
 defmodule Mix.Tasks.Eunomo.Gen.Config do
+  use Mix.Task
+
   @config_filename ".eunomo.exs"
   @generated_file """
-  # Used by "mix eunomo"
+  # Used by "mix eunomo" with Elixir `< 1.13.0`
   [
     inputs: :read_from_dot_formatter,
     formatter: [
-      Eunomo.Formatter.AlphabeticalAliasSorter,
-      Eunomo.Formatter.AlphabeticalImportSorter,
-      Eunomo.Formatter.AlphabeticalRequireSorter
+      Eunomo.AliasSorter,
+      Eunomo.ImportSorter,
+      Eunomo.RequireSorter
     ]
   ]
   """
+  @shortdoc "Generates the default configuration. NOTE: Usage only recommended for Elixir version `< 1.13.0`!"
 
   @moduledoc """
-  Generates the default configuration for `Eunomo`.
+  #{@shortdoc}
+
+  For `>= 1.13.0` the formatter comes with a [plugin
+  system](https://hexdocs.pm/mix/1.13.0/Mix.Tasks.Format.html#module-plugins). You should use that
+  instead, see the `.formatter.exs` file in this repo for an example usage.
 
   The `#{@config_filename}` file is created in the current working directory. If it already exists
   the task is aborted.
@@ -23,9 +30,8 @@ defmodule Mix.Tasks.Eunomo.Gen.Config do
   ```
   """
 
-  use Mix.Task
-
   @impl true
+  @spec run(command_line_args :: [binary]) :: :ok
   def run(_args) do
     create_config_file()
   end

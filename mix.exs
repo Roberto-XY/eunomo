@@ -5,7 +5,7 @@ defmodule Eunomo.MixProject do
     [
       app: :eunomo,
       version: "1.0.0",
-      elixir: ">= 1.13.0",
+      # elixir: ">= 1.13.0",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       dialyzer: [
@@ -56,7 +56,7 @@ defmodule Eunomo.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      format!: ["format", "eunomo", "credo --strict"]
+      format!: ["format", "credo --strict"]
     ]
   end
 end

@@ -1,4 +1,4 @@
-defmodule AlphabeticalAliasSorterTest do
+defmodule AliasSorterTest do
   use ExUnit.Case
-  doctest Eunomo.Formatter.AlphabeticalAliasSorter
+  doctest Eunomo.AliasSorter
 end
