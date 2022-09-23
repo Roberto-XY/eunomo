@@ -25,7 +25,7 @@ end
 
 ### Elixir `>= 1.13.0` & version `1.0.0`
 
-Uses Elxir formatter [plugin
+Uses Elixir formatter [plugin
 system](https://hexdocs.pm/mix/1.13.0/Mix.Tasks.Format.html#module-plugins).
 
 ```elixir
