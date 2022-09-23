@@ -3,7 +3,7 @@ defmodule Eunomo.LineMap do
 
   # Super simple text abstraction. Maps a line_number to an iodata chunk.
   # Possibly to naive for complex transformations -
-  # just right for `alias`, `import` and `require sorting.  #
+  # just right for `alias`, `import` and `require sorting.
   # Performance was not a design consideration.
 
   @type line_number :: non_neg_integer

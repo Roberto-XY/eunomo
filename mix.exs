@@ -14,7 +14,12 @@ defmodule Eunomo.MixProject do
         plt_file: {:no_warn, "plts/eunomo.plt"}
       ],
       aliases: aliases(),
-      package: package()
+      package: package(),
+      docs: [
+        extras: [
+          "README.md": [title: "README"]
+        ]
+      ]
     ]
   end
 

@@ -12,6 +12,9 @@ system](https://hexdocs.pm/mix/1.13.0/Mix.Tasks.Format.html#module-plugins). See
 
 See [https://hexdocs.pm/eunomo](https://hexdocs.pm/eunomo) for further documentation.
 
+https://github.com/Roberto-XY/eunomo
+
+
 ## Installation
 
 The package can be installed by adding `eunomo` to your list of dependencies in `mix.exs`:
@@ -23,3 +26,26 @@ def deps do
   ]
 end
 ```
+
+## Usage
+
+### Elixir `>= 1.13.0` & version `1.0.0`
+
+```elixir
+# .formatter.exs
+[
+  # Usage of new formatter plugin system in Elixir `>= 1.13.0`.
+  plugins: [
+    Eunomo.AliasSorter,
+    Eunomo.ImportSorter,
+    Eunomo.RequireSorter
+  ],
+  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+]
+```
+
+
+### Elixir `< 1.13.0` & version `0.1.3 `
+
+Before Elxiir version `1.13.0` there was no way to hook plugins into the default formatter. Hence
+two Mix tasks were provided: [`mix eunomo.gen.config`](https://hexdocs.pm/eunomo/0.1.3/Mix.Tasks.Eunomo.Gen.Config.html) & [`mix eunomo`](https://hexdocs.pm/eunomo/0.1.3/Mix.Tasks.Eunomo.html#content).
