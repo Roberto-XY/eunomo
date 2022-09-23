@@ -48,9 +48,6 @@ jobs:
       - name: Run formatter
         run: mix format --check-formatted
 
-      - name: Run Eunomo
-        run: mix eunomo --check-formatted
-
       - name: Run Credo
         run: mix credo --strict
 
