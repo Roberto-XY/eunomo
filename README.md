@@ -2,7 +2,7 @@
 
 The default Elixir formatter has the philosophy of not modifying non metadata parts of the AST.
 `Eunomo` does not adhere to this philosophy and is meant to be used as an extension to the default
-formatter. As of now the single use case is to sort `import`, `alias` and `require` definitions
+formatter. As of now, the single use case is to sort `import`, `alias` and `require` definitions
 alphabetically.
 
 If you use Elixir version `< 1.13.0` you should use the provided `mix eunomo.gen.config`
@@ -47,5 +47,5 @@ end
 
 ### Elixir `< 1.13.0` & version `0.1.3 `
 
-Before Elxiir version `1.13.0` there was no way to hook plugins into the default formatter. Hence
+Before Elixir version `1.13.0`, there was no way to hook plugins into the default formatter. Hence
 two Mix tasks were provided: [`mix eunomo.gen.config`](https://hexdocs.pm/eunomo/0.1.3/Mix.Tasks.Eunomo.Gen.Config.html) & [`mix eunomo`](https://hexdocs.pm/eunomo/0.1.3/Mix.Tasks.Eunomo.html#content).
