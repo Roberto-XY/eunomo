@@ -27,7 +27,6 @@ defmodule Eunomo.MixProject do
     [
       description: "Elixir `alias`, `import` and `require` sorter.",
       files: [
-        ".eunomo.exs",
         "lib",
         "LICENSE.md",
         "mix.exs",
@@ -36,7 +35,8 @@ defmodule Eunomo.MixProject do
       maintainers: ["A. Roberto Fischer"],
       licenses: ["Apache-2.0"],
       links: %{
-        "GitHub" => "https://github.com/Roberto-XY/eunomo"
+        "GitHub" => "https://github.com/Roberto-XY/eunomo",
+        "Docs" => "https://hexdocs.pm/eunomo"
       }
     ]
   end
