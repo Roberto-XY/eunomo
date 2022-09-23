@@ -5,14 +5,12 @@ The default Elixir formatter has the philosophy of not modifying non metadata pa
 formatter. As of now, the single use case is to sort `import`, `alias` and `require` definitions
 alphabetically.
 
-If you use Elixir version `< 1.13.0` you should use the provided `mix eunomo.gen.config`
-& `mix eunomo` tasks. For `>= 1.13.0` the formatter comes with a [plugin
-system](https://hexdocs.pm/mix/1.13.0/Mix.Tasks.Format.html#module-plugins). See the
-`.formatter.exs` file in this repo for an example usage.
+If you use Elixir version `< 1.13.0` you should use the provided `mix eunomo.gen.config` & `mix
+eunomo` tasks. For `>= 1.13.0` the formatter comes with a [plugin
+system](https://hexdocs.pm/mix/1.13.0/Mix.Tasks.Format.html#module-plugins).
 
-See [https://hexdocs.pm/eunomo](https://hexdocs.pm/eunomo) for further documentation.
-
-https://github.com/Roberto-XY/eunomo
+See [https://hexdocs.pm/eunomo](https://hexdocs.pm/eunomo) for further documentation &
+https://github.com/Roberto-XY/eunomo for the source code.
 
 
 ## Installation
@@ -44,8 +42,13 @@ end
 ]
 ```
 
+Running `mix format` is going to take over as usal from here. All `mix format` options also apply to
+Eunomo plugins.
 
 ### Elixir `< 1.13.0` & version `0.1.3 `
 
 Before Elixir version `1.13.0`, there was no way to hook plugins into the default formatter. Hence
-two Mix tasks were provided: [`mix eunomo.gen.config`](https://hexdocs.pm/eunomo/0.1.3/Mix.Tasks.Eunomo.Gen.Config.html) & [`mix eunomo`](https://hexdocs.pm/eunomo/0.1.3/Mix.Tasks.Eunomo.html#content).
+two Mix tasks were provided: [`mix
+eunomo.gen.config`](https://hexdocs.pm/eunomo/0.1.3/Mix.Tasks.Eunomo.Gen.Config.html) & [`mix
+eunomo`](https://hexdocs.pm/eunomo/0.1.3/Mix.Tasks.Eunomo.html#content). This approach does not play
+nicely with umbrella applications.
