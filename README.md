@@ -5,10 +5,6 @@ The default Elixir formatter has the philosophy of not modifying non metadata pa
 formatter. As of now, the single use case is to sort `import`, `alias` and `require` definitions
 alphabetically.
 
-If you use Elixir version `< 1.13.0` you should use the provided `mix eunomo.gen.config` & `mix
-eunomo` tasks. For `>= 1.13.0` the formatter comes with a [plugin
-system](https://hexdocs.pm/mix/1.13.0/Mix.Tasks.Format.html#module-plugins).
-
 See [https://hexdocs.pm/eunomo](https://hexdocs.pm/eunomo) for further documentation &
 https://github.com/Roberto-XY/eunomo for the source code.
 
@@ -28,6 +24,9 @@ end
 ## Usage
 
 ### Elixir `>= 1.13.0` & version `1.0.0`
+
+Uses Elxir formatter [plugin
+system](https://hexdocs.pm/mix/1.13.0/Mix.Tasks.Format.html#module-plugins).
 
 ```elixir
 # .formatter.exs
