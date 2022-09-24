@@ -1,4 +1,4 @@
-defmodule Eunomo.Formatter.AlphabeticalAliasSorter do
+defmodule Eunomo.AliasSorter do
   @moduledoc """
   Sorts `alias` definitions alphabetically.
 
@@ -27,7 +27,7 @@ defmodule Eunomo.Formatter.AlphabeticalAliasSorter do
       ...> alias A
       ...> alias Eunomo.Patient
       ...> \"\"\"
-      ...> Eunomo.format_string(code_snippet, [Eunomo.Formatter.AlphabeticalAliasSorter])
+      ...> Eunomo.AliasSorter.format(code_snippet, [])
       \"\"\"
       alias __MODULE__.A
       alias __MODULE__.B
@@ -46,14 +46,23 @@ defmodule Eunomo.Formatter.AlphabeticalAliasSorter do
 
   """
 
-  @behaviour Eunomo.Formatter
+  @behaviour Mix.Tasks.Format
 
-  alias Eunomo.Formatter.AlphabeticalExpressionSorter
+  alias Eunomo.ExpressionSorter
   alias Eunomo.LineMap
 
   @impl true
-  @spec format(LineMap.t()) :: LineMap.t()
-  def format(line_map) when is_map(line_map) do
-    AlphabeticalExpressionSorter.format(line_map, :alias)
+  @spec features(Keyword.t()) :: [sigils: [atom()], extensions: [binary()]]
+  def features(_opts) do
+    [extensions: [".ex", ".exs"]]
+  end
+
+  @impl true
+  @spec format(String.t(), Keyword.t()) :: String.t()
+  def format(contents, _opts) do
+    contents
+    |> LineMap.from_code_string()
+    |> ExpressionSorter.format(:alias)
+    |> LineMap.to_code_string()
   end
 end

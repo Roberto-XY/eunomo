@@ -14,7 +14,12 @@ defmodule Eunomo.MixProject do
         plt_file: {:no_warn, "plts/eunomo.plt"}
       ],
       aliases: aliases(),
-      package: package()
+      package: package(),
+      docs: [
+        extras: [
+          "README.md": [title: "README"]
+        ]
+      ]
     ]
   end
 
@@ -22,7 +27,6 @@ defmodule Eunomo.MixProject do
     [
       description: "Elixir `alias`, `import` and `require` sorter.",
       files: [
-        ".eunomo.exs",
         "lib",
         "LICENSE.md",
         "mix.exs",
@@ -31,7 +35,8 @@ defmodule Eunomo.MixProject do
       maintainers: ["A. Roberto Fischer"],
       licenses: ["Apache-2.0"],
       links: %{
-        "GitHub" => "https://github.com/Roberto-XY/eunomo"
+        "GitHub" => "https://github.com/Roberto-XY/eunomo",
+        "Docs" => "https://hexdocs.pm/eunomo"
       }
     ]
   end
@@ -56,7 +61,7 @@ defmodule Eunomo.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      format!: ["format", "eunomo", "credo --strict"]
+      format!: ["format", "credo --strict"]
     ]
   end
 end

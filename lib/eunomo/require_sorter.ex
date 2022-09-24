@@ -1,4 +1,4 @@
-defmodule Eunomo.Formatter.AlphabeticalRequireSorter do
+defmodule Eunomo.RequireSorter do
   @moduledoc """
   Sorts `require` definitions alphabetically.
 
@@ -25,7 +25,7 @@ defmodule Eunomo.Formatter.AlphabeticalRequireSorter do
       ...> require A
       ...> require Eunomo.Patient
       ...> \"\"\"
-      ...> Eunomo.format_string(code_snippet, [Eunomo.Formatter.AlphabeticalRequireSorter])
+      ...> Eunomo.RequireSorter.format(code_snippet, [])
       \"\"\"
       require Eunomo.C
       require Eunomo.Z
@@ -42,14 +42,23 @@ defmodule Eunomo.Formatter.AlphabeticalRequireSorter do
 
   """
 
-  @behaviour Eunomo.Formatter
+  @behaviour Mix.Tasks.Format
 
-  alias Eunomo.Formatter.AlphabeticalExpressionSorter
+  alias Eunomo.ExpressionSorter
   alias Eunomo.LineMap
 
   @impl true
-  @spec format(LineMap.t()) :: LineMap.t()
-  def format(line_map) when is_map(line_map) do
-    AlphabeticalExpressionSorter.format(line_map, :require)
+  @spec features(Keyword.t()) :: [sigils: [atom()], extensions: [binary()]]
+  def features(_opts) do
+    [extensions: [".ex", ".exs"]]
+  end
+
+  @impl true
+  @spec format(String.t(), Keyword.t()) :: String.t()
+  def format(contents, _opts) do
+    contents
+    |> LineMap.from_code_string()
+    |> ExpressionSorter.format(:require)
+    |> LineMap.to_code_string()
   end
 end
