@@ -35,12 +35,12 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.elixir }}-mix-${{ hashFiles('**/mix.lock') }}
           restore-keys: ${{ runner.os }}-mix-
 
-      - name: Cache dialyzer plt
-        uses: actions/cache@v2
-        with:
-          path: plts
-          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-dialyzer
-          restore-keys: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-dialyzer
+      # - name: Cache dialyzer plt
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: plts
+      #     key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-dialyzer
+      #     restore-keys: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-dialyzer
 
       - name: Install Dependencies
         run: mix deps.get
@@ -58,4 +58,4 @@ jobs:
         run: mix test
 
       - name: Run dialyzer
-        run: mkdir -p plts && mix dialyzer
+        run: mix dialyzer
