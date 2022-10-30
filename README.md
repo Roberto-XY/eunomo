@@ -16,14 +16,14 @@ The package can be installed by adding `eunomo` to your list of dependencies in 
 ```elixir
 def deps do
   [
-    {:eunomo, only: :dev, "~> 1.0.0"}
+    {:eunomo, "~> 1.0.0", only: :dev}
   ]
 end
 ```
 
 ## Usage
 
-### Elixir `>= 1.13.0` & version `1.0.0`
+### Elixir `>= 1.13.0` & version `2.0.0`
 
 Uses Elixir formatter [plugin
 system](https://hexdocs.pm/mix/1.13.0/Mix.Tasks.Format.html#module-plugins).
@@ -31,11 +31,11 @@ system](https://hexdocs.pm/mix/1.13.0/Mix.Tasks.Format.html#module-plugins).
 ```elixir
 # .formatter.exs
 [
-  # Usage of new formatter plugin system in Elixir `>= 1.13.0`.
-  plugins: [
-    Eunomo.AliasSorter,
-    Eunomo.ImportSorter,
-    Eunomo.RequireSorter
+  plugins: [Eunomo],
+  eunomo_opts: [
+    sort_alias: true,
+    sort_import: true,
+    sort_require: true
   ],
   inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
 ]
