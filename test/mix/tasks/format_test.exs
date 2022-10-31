@@ -1,4 +1,6 @@
-Code.require_file("./test_helper.exs", __DIR__)
+# Copied from upstream https://github.com/elixir-lang/elixir/blob/v1.14.1/lib/mix/test/mix/tasks/format_test.exs
+
+Code.require_file("../../test_helper.exs", __DIR__)
 
 defmodule Mix.Tasks.FormatTest do
   use MixTest.Case
@@ -465,87 +467,87 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
-  # test "reads exported configuration from dependencies and subdirectories", context do
-  #   in_tmp(context.test, fn ->
-  #     Mix.Project.push(__MODULE__.FormatWithDepsApp)
+  test "reads exported configuration from dependencies and subdirectories", context do
+    in_tmp(context.test, fn ->
+      Mix.Project.push(__MODULE__.FormatWithDepsApp)
 
-  #     File.mkdir_p!("deps/my_dep/")
+      File.mkdir_p!("deps/my_dep/")
 
-  #     File.write!("deps/my_dep/.formatter.exs", """
-  #     [export: [locals_without_parens: [my_fun: 2]]]
-  #     """)
+      File.write!("deps/my_dep/.formatter.exs", """
+      [export: [locals_without_parens: [my_fun: 2]]]
+      """)
 
-  #     File.mkdir_p!("lib/sub")
-  #     File.mkdir_p!("lib/not_used_and_wont_raise")
+      File.mkdir_p!("lib/sub")
+      File.mkdir_p!("lib/not_used_and_wont_raise")
 
-  #     File.write!(".formatter.exs", """
-  #     [subdirectories: ["lib"]]
-  #     """)
+      File.write!(".formatter.exs", """
+      [subdirectories: ["lib"]]
+      """)
 
-  #     File.write!("lib/.formatter.exs", """
-  #     [subdirectories: ["*"]]
-  #     """)
+      File.write!("lib/.formatter.exs", """
+      [subdirectories: ["*"]]
+      """)
 
-  #     File.write!("lib/sub/.formatter.exs", """
-  #     [inputs: "a.ex", import_deps: [:my_dep]]
-  #     """)
+      File.write!("lib/sub/.formatter.exs", """
+      [inputs: "a.ex", import_deps: [:my_dep]]
+      """)
 
-  #     File.write!("lib/sub/a.ex", """
-  #     my_fun :foo, :bar
-  #     other_fun :baz
-  #     """)
+      File.write!("lib/sub/a.ex", """
+      my_fun :foo, :bar
+      other_fun :baz
+      """)
 
-  #     Mix.Tasks.Format.run([])
+      Mix.Tasks.Format.run([])
 
-  #     assert File.read!("lib/sub/a.ex") == """
-  #            my_fun :foo, :bar
-  #            other_fun(:baz)
-  #            """
+      assert File.read!("lib/sub/a.ex") == """
+             my_fun :foo, :bar
+             other_fun(:baz)
+             """
 
-  #     Mix.Tasks.Format.run(["lib/sub/a.ex"])
+      Mix.Tasks.Format.run(["lib/sub/a.ex"])
 
-  #     assert File.read!("lib/sub/a.ex") == """
-  #            my_fun :foo, :bar
-  #            other_fun(:baz)
-  #            """
+      assert File.read!("lib/sub/a.ex") == """
+             my_fun :foo, :bar
+             other_fun(:baz)
+             """
 
-  #     # Update .formatter.exs, check that file is updated
-  #     File.write!("lib/sub/.formatter.exs", """
-  #     [inputs: "a.ex"]
-  #     """)
+      # Update .formatter.exs, check that file is updated
+      File.write!("lib/sub/.formatter.exs", """
+      [inputs: "a.ex"]
+      """)
 
-  #     File.touch!("lib/sub/.formatter.exs", {{2038, 1, 1}, {0, 0, 0}})
-  #     Mix.Tasks.Format.run([])
+      File.touch!("lib/sub/.formatter.exs", {{2038, 1, 1}, {0, 0, 0}})
+      Mix.Tasks.Format.run([])
 
-  #     assert File.read!("lib/sub/a.ex") == """
-  #            my_fun(:foo, :bar)
-  #            other_fun(:baz)
-  #            """
+      assert File.read!("lib/sub/a.ex") == """
+             my_fun(:foo, :bar)
+             other_fun(:baz)
+             """
 
-  #     # Add a new entry to "lib" and it also gets picked.
-  #     File.mkdir_p!("lib/extra")
+      # Add a new entry to "lib" and it also gets picked.
+      File.mkdir_p!("lib/extra")
 
-  #     File.write!("lib/extra/.formatter.exs", """
-  #     [inputs: "a.ex", locals_without_parens: [other_fun: 1]]
-  #     """)
+      File.write!("lib/extra/.formatter.exs", """
+      [inputs: "a.ex", locals_without_parens: [other_fun: 1]]
+      """)
 
-  #     File.write!("lib/extra/a.ex", """
-  #     my_fun :foo, :bar
-  #     other_fun :baz
-  #     """)
+      File.write!("lib/extra/a.ex", """
+      my_fun :foo, :bar
+      other_fun :baz
+      """)
 
-  #     File.touch!("lib/extra/.formatter.exs", {{2038, 1, 1}, {0, 0, 0}})
-  #     Mix.Tasks.Format.run([])
+      File.touch!("lib/extra/.formatter.exs", {{2038, 1, 1}, {0, 0, 0}})
+      Mix.Tasks.Format.run([])
 
-  #     {_, formatter_opts} = Mix.Tasks.Format.formatter_for_file("lib/extra/a.ex")
-  #     assert [other_fun: 1] = Keyword.get(formatter_opts, :locals_without_parens)
+      {_, formatter_opts} = Mix.Tasks.Format.formatter_for_file("lib/extra/a.ex")
+      assert [other_fun: 1] = Keyword.get(formatter_opts, :locals_without_parens)
 
-  #     assert File.read!("lib/extra/a.ex") == """
-  #            my_fun(:foo, :bar)
-  #            other_fun :baz
-  #            """
-  #   end)
-  # end
+      assert File.read!("lib/extra/a.ex") == """
+             my_fun(:foo, :bar)
+             other_fun :baz
+             """
+    end)
+  end
 
   test "validates subdirectories in :subdirectories", context do
     in_tmp(context.test, fn ->
