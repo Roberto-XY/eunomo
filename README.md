@@ -31,6 +31,7 @@ system](https://hexdocs.pm/mix/1.13.0/Mix.Tasks.Format.html#module-plugins).
 ```elixir
 # .formatter.exs
 [
+  # Usage of new formatter plugin system in Elixir `>= 1.13.0`.
   plugins: [Eunomo],
   eunomo_opts: [
     sort_alias: true,
