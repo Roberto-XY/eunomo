@@ -17,9 +17,9 @@ jobs:
           - otp: "25.x"
             elixir: "1.13.4"
           - otp: "23.x"
-            elixir: "1.14.0"
+            elixir: "1.14.1"
           - otp: "25.x"
-            elixir: "1.14.0"
+            elixir: "1.14.1"
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
