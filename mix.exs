@@ -36,7 +36,7 @@ defmodule Eunomo.MixProject do
       maintainers: ["A. Roberto Fischer"],
       licenses: ["Apache-2.0"],
       links: %{
-        "GitHub" => "https://github.com/Roberto-XY/eunomo",
+        "GitHub" => "https://github.com/Roberto-XY/eunomo"
       }
     ]
   end
