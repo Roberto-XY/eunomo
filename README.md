@@ -16,7 +16,7 @@ The package can be installed by adding `eunomo` to your list of dependencies in 
 ```elixir
 def deps do
   [
-    {:eunomo, "~> 1.0.0", only: :dev}
+    {:eunomo, "~> 2.0.0", only: :dev}
   ]
 end
 ```
