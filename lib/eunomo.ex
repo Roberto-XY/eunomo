@@ -151,7 +151,6 @@ defmodule Eunomo do
     # allowing multiple formatters formatting the same file extension after each other
     # (https://github.com/elixir-lang/elixir/pull/12032). But .ex and .exs files do not allow this,
     # hence we have to explicitly call the Elixir formatter here.
-    # FIXME: Ask upstream if this should change
     |> elixir_format(opts)
     |> eunomo_format(opts)
   end
