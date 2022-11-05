@@ -4,7 +4,7 @@ defmodule Eunomo.MixProject do
   def project do
     [
       app: :eunomo,
-      version: "1.0.0",
+      version: "2.0.0",
       elixir: ">= 1.13.0",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -14,6 +14,7 @@ defmodule Eunomo.MixProject do
         plt_file: {:no_warn, "plts/eunomo.plt"}
       ],
       aliases: aliases(),
+      preferred_cli_env: [test_all: :test],
       package: package(),
       docs: [
         extras: [
@@ -35,7 +36,7 @@ defmodule Eunomo.MixProject do
       maintainers: ["A. Roberto Fischer"],
       licenses: ["Apache-2.0"],
       links: %{
-        "GitHub" => "https://github.com/Roberto-XY/eunomo",
+        "GitHub" => "https://github.com/Roberto-XY/eunomo"
       }
     ]
   end
@@ -60,7 +61,8 @@ defmodule Eunomo.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      format!: ["format", "credo --strict"]
+      format!: ["format", "credo --strict"],
+      test_all: ["test", "cmd ./test/priv/run_upstream_tests.sh"]
     ]
   end
 end
