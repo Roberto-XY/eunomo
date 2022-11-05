@@ -2,17 +2,17 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 jobs:
   test:
     name: Eunomo (Elixir ${{ matrix.elixir }} OTP ${{ matrix.otp }})
     strategy:
       matrix:
         include:
-          - otp: "23.x"
+          - otp: "22.x"
             elixir: "1.13.4"
           - otp: "25.x"
             elixir: "1.13.4"
