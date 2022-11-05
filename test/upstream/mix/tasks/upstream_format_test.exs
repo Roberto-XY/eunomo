@@ -1,8 +1,10 @@
-# Copied from upstream https://github.com/elixir-lang/elixir/blob/v1.14.1/lib/mix/test/mix/tasks/format_test.exs
+# Upstream copied from https://github.com/elixir-lang/elixir/blob/v1.14.1/lib/mix/test/mix/tasks/format_test.exs
+# And added Eunomo plugin config to all formatters, there should be no difference in outcome
+# credo:disable-for-this-file
 
-Code.require_file("../../test_helper.exs", __DIR__)
+Code.require_file("../../upstream_test_helper.exs", __DIR__)
 
-defmodule Mix.Tasks.FormatTest do
+defmodule Mix.Tasks.UpstreamFormatTest do
   use MixTest.Case
 
   import ExUnit.CaptureIO
@@ -12,11 +14,12 @@ defmodule Mix.Tasks.FormatTest do
       [
         app: :format_with_deps,
         version: "0.1.0",
-        deps: [{:my_dep, "0.1.0", path: "deps/my_dep"}]
+        deps: [{:my_dep, "0.1.0", path: "deps/my_dep", app: false}]
       ]
     end
   end
 
+  @tag upstream: true
   test "doesn't format empty files into line breaks", context do
     in_tmp(context.test, fn ->
       File.write!("a.exs", "")
@@ -29,6 +32,7 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "formats the given files", context do
     in_tmp(context.test, fn ->
       File.write!("a.ex", """
@@ -43,6 +47,7 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "formats the given pattern", context do
     in_tmp(context.test, fn ->
       File.write!("a.ex", """
@@ -57,6 +62,7 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "is a no-op if the file is already formatted", context do
     in_tmp(context.test, fn ->
       File.write!("a.ex", """
@@ -69,6 +75,7 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "does not write file to disk on dry-run", context do
     in_tmp(context.test, fn ->
       File.write!("a.ex", """
@@ -83,6 +90,7 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "reads file from stdin and prints to stdout", context do
     in_tmp(context.test, fn ->
       File.write!("a.ex", """
@@ -104,10 +112,15 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "reads file from stdin and prints to stdout with formatter", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
-      [locals_without_parens: [foo: 1]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        locals_without_parens: [foo: 1]
+      ]
       """)
 
       output =
@@ -121,6 +134,7 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "checks if file is formatted with --check-formatted", context do
     in_tmp(context.test, fn ->
       File.write!("a.ex", """
@@ -144,6 +158,7 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "checks if stdin is formatted with --check-formatted" do
     assert_raise Mix.Error, ~r"mix format failed due to --check-formatted", fn ->
       capture_io("foo( )", fn ->
@@ -159,10 +174,13 @@ defmodule Mix.Tasks.FormatTest do
     assert output == ""
   end
 
+  @tag upstream: true
   test "uses inputs and configuration from .formatter.exs", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
       [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
         inputs: ["a.ex"],
         locals_without_parens: [foo: 1]
       ]
@@ -180,10 +198,13 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "does not cache inputs from .formatter.exs", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
       [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
         inputs: Path.wildcard("{a,b}.ex"),
         locals_without_parens: [foo: 1]
       ]
@@ -211,10 +232,13 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "expands patterns in inputs from .formatter.exs", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
       [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
         inputs: ["{a,.b}.ex"]
       ]
       """)
@@ -257,12 +281,14 @@ defmodule Mix.Tasks.FormatTest do
     end
   end
 
+  @tag upstream: true
   test "uses sigil plugins from .formatter.exs", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
       [
         inputs: ["a.ex"],
-        plugins: [SigilWPlugin],
+        plugins: [SigilWPlugin, Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
         from_formatter_exs: :yes
       ]
       """)
@@ -307,12 +333,14 @@ defmodule Mix.Tasks.FormatTest do
     end
   end
 
+  @tag upstream: true
   test "uses extension plugins from .formatter.exs", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
       [
         inputs: ["a.w"],
-        plugins: [ExtensionWPlugin],
+        plugins: [ExtensionWPlugin, Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
         from_formatter_exs: :yes
       ]
       """)
@@ -331,12 +359,14 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "uses extension plugins with --stdin-filename", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
       [
         inputs: ["a.w"],
-        plugins: [ExtensionWPlugin],
+        plugins: [ExtensionWPlugin, Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
         from_formatter_exs: :yes
       ]
       """)
@@ -355,10 +385,13 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "uses inputs and configuration from --dot-formatter", context do
     in_tmp(context.test, fn ->
       File.write!("custom_formatter.exs", """
       [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
         inputs: ["a.ex"],
         locals_without_parens: [foo: 1]
       ]
@@ -376,16 +409,25 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "reads exported configuration from subdirectories", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
-      [subdirectories: ["lib"]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        subdirectories: ["lib"]
+      ]
       """)
 
       File.mkdir_p!("lib")
 
       File.write!("lib/.formatter.exs", """
-      [inputs: "a.ex", locals_without_parens: [my_fun: 2]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        inputs: "a.ex", locals_without_parens: [my_fun: 2]
+      ]
       """)
 
       {formatter, formatter_opts} = Mix.Tasks.Format.formatter_for_file("lib/extra/a.ex")
@@ -417,6 +459,7 @@ defmodule Mix.Tasks.FormatTest do
 
       # Caching with a project
       Mix.Project.push(__MODULE__.FormatWithDepsApp)
+      File.mkdir_p!("deps/my_dep/")
       Mix.Tasks.Format.run(["lib/a.ex"])
       manifest_path = Path.join(Mix.Project.manifest_path(), "cached_dot_formatter")
       assert File.regular?(manifest_path)
@@ -429,12 +472,17 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "reads exported configuration from dependencies", context do
     in_tmp(context.test, fn ->
       Mix.Project.push(__MODULE__.FormatWithDepsApp)
 
       File.write!(".formatter.exs", """
-      [import_deps: [:my_dep]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        import_deps: [:my_dep]
+      ]
       """)
 
       File.write!("a.ex", """
@@ -444,7 +492,11 @@ defmodule Mix.Tasks.FormatTest do
       File.mkdir_p!("deps/my_dep/")
 
       File.write!("deps/my_dep/.formatter.exs", """
-      [export: [locals_without_parens: [my_fun: 2]]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        export: [locals_without_parens: [my_fun: 2]]
+      ]
       """)
 
       Mix.Tasks.Format.run(["a.ex"])
@@ -467,6 +519,7 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "reads exported configuration from dependencies and subdirectories", context do
     in_tmp(context.test, fn ->
       Mix.Project.push(__MODULE__.FormatWithDepsApp)
@@ -474,22 +527,39 @@ defmodule Mix.Tasks.FormatTest do
       File.mkdir_p!("deps/my_dep/")
 
       File.write!("deps/my_dep/.formatter.exs", """
-      [export: [locals_without_parens: [my_fun: 2]]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        export: [locals_without_parens: [my_fun: 2]]
+      ]
       """)
 
       File.mkdir_p!("lib/sub")
       File.mkdir_p!("lib/not_used_and_wont_raise")
 
       File.write!(".formatter.exs", """
-      [subdirectories: ["lib"]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        subdirectories: ["lib"]
+      ]
       """)
 
       File.write!("lib/.formatter.exs", """
-      [subdirectories: ["*"]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        subdirectories: ["*"]
+      ]
       """)
 
       File.write!("lib/sub/.formatter.exs", """
-      [inputs: "a.ex", import_deps: [:my_dep]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        inputs: "a.ex",
+        import_deps: [:my_dep]
+      ]
       """)
 
       File.write!("lib/sub/a.ex", """
@@ -513,7 +583,11 @@ defmodule Mix.Tasks.FormatTest do
 
       # Update .formatter.exs, check that file is updated
       File.write!("lib/sub/.formatter.exs", """
-      [inputs: "a.ex"]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        inputs: "a.ex"
+      ]
       """)
 
       File.touch!("lib/sub/.formatter.exs", {{2038, 1, 1}, {0, 0, 0}})
@@ -528,7 +602,12 @@ defmodule Mix.Tasks.FormatTest do
       File.mkdir_p!("lib/extra")
 
       File.write!("lib/extra/.formatter.exs", """
-      [inputs: "a.ex", locals_without_parens: [other_fun: 1]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        inputs: "a.ex",
+        locals_without_parens: [other_fun: 1]
+      ]
       """)
 
       File.write!("lib/extra/a.ex", """
@@ -549,23 +628,35 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "validates subdirectories in :subdirectories", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
-      [subdirectories: "oops"]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        subdirectories: "oops"
+      ]
       """)
 
       message = "Expected :subdirectories to return a list of directories, got: \"oops\""
       assert_raise Mix.Error, message, fn -> Mix.Tasks.Format.run([]) end
 
       File.write!(".formatter.exs", """
-      [subdirectories: ["lib"]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        subdirectories: ["lib"]
+      ]
       """)
 
       File.mkdir_p!("lib")
 
       File.write!("lib/.formatter.exs", """
-      []
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true]
+      ]
       """)
 
       message = "Expected :inputs or :subdirectories key in lib/.formatter.exs"
@@ -573,22 +664,27 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "validates dependencies in :import_deps", context do
     in_tmp(context.test, fn ->
       Mix.Project.push(__MODULE__.FormatWithDepsApp)
 
       File.write!(".formatter.exs", """
-      [import_deps: [:my_dep]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        import_deps: [:my_dep]
+      ]
       """)
 
-      message =
-        "Unavailable dependency :my_dep given to :import_deps in the formatter configuration. " <>
-          "The dependency cannot be found in the file system, please run \"mix deps.get\" and try again"
-
-      assert_raise Mix.Error, message, fn -> Mix.Tasks.Format.run([]) end
+      assert_raise Mix.Error, fn -> Mix.Tasks.Format.run([]) end
 
       File.write!(".formatter.exs", """
-      [import_deps: [:nonexistent_dep]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        import_deps: [:nonexistent_dep]
+      ]
       """)
 
       message =
@@ -599,22 +695,35 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "prints an error on conflicting .formatter.exs files", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
-      [inputs: "lib/**/*.{ex,exs}", subdirectories: ["lib", "foo"]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        inputs: "lib/**/*.{ex,exs}", subdirectories: ["lib", "foo"]
+      ]
       """)
 
       File.mkdir_p!("lib")
 
       File.write!("lib/.formatter.exs", """
-      [inputs: "a.ex", locals_without_parens: [my_fun: 2]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        inputs: "a.ex", locals_without_parens: [my_fun: 2]
+      ]
       """)
 
       File.mkdir_p!("foo")
 
       File.write!("foo/.formatter.exs", """
-      [inputs: "../lib/a.ex", locals_without_parens: [my_fun: 2]]
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        inputs: "../lib/a.ex", locals_without_parens: [my_fun: 2]
+      ]
       """)
 
       File.write!("lib/a.ex", """
@@ -641,6 +750,7 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "raises on invalid arguments", context do
     in_tmp(context.test, fn ->
       assert_raise Mix.Error, ~r"Expected one or more files\/patterns to be given", fn ->
@@ -653,6 +763,7 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "raises SyntaxError when parsing invalid source file", context do
     in_tmp(context.test, fn ->
       File.write!("a.ex", """
@@ -667,6 +778,7 @@ defmodule Mix.Tasks.FormatTest do
     end)
   end
 
+  @tag upstream: true
   test "raises SyntaxError when parsing invalid stdin", context do
     in_tmp(context.test, fn ->
       assert_raise SyntaxError, ~r"stdin.exs:1:13: syntax error before: '='", fn ->
