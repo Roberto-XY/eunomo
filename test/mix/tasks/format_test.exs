@@ -1,7 +1,7 @@
 # credo:disable-for-this-file
 Code.require_file("../../upstream_test_helper.exs", __DIR__)
 
-defmodule FormatTest do
+defmodule Mix.Tasks.FormatTest do
   use MixTest.Case
 
   @content """
