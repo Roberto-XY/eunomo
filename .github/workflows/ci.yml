@@ -22,14 +22,14 @@ jobs:
             elixir: "1.14.1"
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
 
       - name: Cache mix dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: deps
           key: ${{ runner.os }}-${{ matrix.elixir }}-mix-${{ hashFiles('**/mix.lock') }}
