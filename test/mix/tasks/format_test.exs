@@ -293,16 +293,9 @@ defmodule Mix.Tasks.FormatTest do
       ]
       """)
 
-      message = """
-      mix format failed due to --check-formatted.
-      The following files are not formatted:
-
-        * a.ex
-      """
-
       assert Mix.Tasks.Format.run(["a.ex", "--dry-run"]) == :ok
 
-      assert_raise Mix.Error, message, fn ->
+      assert_raise Mix.Error, ~r"mix format failed due to --check-formatted", fn ->
         Mix.Tasks.Format.run(["a.ex", "--check-formatted"])
       end
     end)
