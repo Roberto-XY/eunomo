@@ -27,68 +27,12 @@ defmodule Eunomo.ExpressionSorter do
       |> Macro.postwalk(%{}, fn
         {:__block__, _, args} = triple, acc ->
           new_args =
-            Enum.map(args, fn
-              {atom, meta, args} = triple ->
-                if Keyword.has_key?(meta, :line) do
-                  prev_line_number = Keyword.fetch!(meta, :line) - 1
-
-                  if Map.has_key?(comments, prev_line_number) do
-                    comment_block =
-                      LineMap.get_continuous_block_backwards(
-                        comments,
-                        prev_line_number
-                      )
-
-                    new_meta = Keyword.put_new(meta, :preceding_comments, comment_block)
-                    {atom, new_meta, args}
-                  else
-                    triple
-                  end
-                else
-                  triple
-                end
-
-              x ->
-                x
-            end)
-            # We need to do this exercise with special new line handling since the default elixir AST
-            # metadata is bugged in the sense that new line metadata is not correctly set in some cases.
-            |> Enum.map(fn
-              {atom, meta, args} = triple ->
-                if Keyword.has_key?(meta, :end_of_expression) do
-                  end_of_expression = Keyword.fetch!(meta, :end_of_expression)
-                  next_line_number = Keyword.fetch!(end_of_expression, :line) + 1
-
-                  if Map.has_key?(new_lines_and_comments, next_line_number) do
-                    new_line_block =
-                      LineMap.get_continuous_block_forwards(
-                        new_lines_and_comments,
-                        next_line_number,
-                        _stop_on = ""
-                      )
-
-                    {_, last} = Enum.max_by(new_line_block, fn {key, _} -> key end)
-
-                    if last == "" do
-                      new_meta =
-                        update_in(meta, [:end_of_expression, :newlines], fn _ ->
-                          map_size(new_line_block) + 1
-                        end)
-
-                      {atom, new_meta, args}
-                    else
-                      triple
-                    end
-                  else
-                    triple
-                  end
-                else
-                  triple
-                end
-
-              x ->
-                x
-            end)
+            args
+            |> Enum.map(&add_preceding_comments_meta(comments, &1))
+            # We need to do this exercise with special new line handling since the default elixir
+            # AST metadata is bugged in the sense that new line metadata is not correctly set in
+            # some cases.
+            |> Enum.map(&add_new_line_meta(new_lines_and_comments, &1))
 
           acc =
             Map.merge(
@@ -117,6 +61,70 @@ defmodule Eunomo.ExpressionSorter do
     |> Map.merge(line_map, fn _k, new, _old -> new end)
   end
 
+  @spec add_preceding_comments_meta(LineMap.t(), Macro.t()) :: Macro.t()
+  defp add_preceding_comments_meta(comments, {atom, meta, args} = triple) do
+    if Keyword.has_key?(meta, :line) do
+      prev_line_number = Keyword.fetch!(meta, :line) - 1
+
+      if Map.has_key?(comments, prev_line_number) do
+        comment_block =
+          LineMap.get_continuous_block_backwards(
+            comments,
+            prev_line_number
+          )
+
+        new_meta = Keyword.put_new(meta, :preceding_comments, comment_block)
+        {atom, new_meta, args}
+      else
+        triple
+      end
+    else
+      triple
+    end
+  end
+
+  defp add_preceding_comments_meta(_comments, triple), do: triple
+
+  # credo:disable-for-lines:30
+  @spec add_new_line_meta(LineMap.t(), Macro.t()) :: Macro.t()
+  defp add_new_line_meta(new_lines_and_comments, {atom, meta, args} = triple) do
+    if Keyword.has_key?(meta, :end_of_expression) do
+      end_of_expression = Keyword.fetch!(meta, :end_of_expression)
+      next_line_number = Keyword.fetch!(end_of_expression, :line) + 1
+
+      if Map.has_key?(new_lines_and_comments, next_line_number) do
+        # Take newlines ore comment lines until next new line
+        new_line_block =
+          LineMap.get_continuous_block_forwards(
+            new_lines_and_comments,
+            next_line_number,
+            _stop_on = ""
+          )
+
+        # The last line must be a new line, otherwise we have only comments which do not indicate
+        # the start of a new block
+        {_, last} = Enum.max_by(new_line_block, fn {key, _} -> key end)
+
+        if last == "" do
+          new_meta =
+            update_in(meta, [:end_of_expression, :newlines], fn _ ->
+              map_size(new_line_block) + 1
+            end)
+
+          {atom, new_meta, args}
+        else
+          triple
+        end
+      else
+        triple
+      end
+    else
+      triple
+    end
+  end
+
+  defp add_new_line_meta(_new_lines_and_comments, triple), do: triple
+
   @typep modifications :: %{optional(LineMap.line_number()) => LineMap.line_number()}
 
   @spec ast_block_to_modifications([Macro.t()], atom) :: modifications()
@@ -135,7 +143,11 @@ defmodule Eunomo.ExpressionSorter do
     %{expression_blocks: expression_blocks, current: current} =
       Enum.reduce(args, %{expression_blocks: [], current: []}, fn
         {^split_expression, meta, _} = element, acc ->
-          case {meta[:line], meta[:end_of_expression][:line], meta[:end_of_expression][:newlines]} do
+          start_line = meta[:line]
+          end_line = meta[:end_of_expression][:line]
+          new_lines = meta[:end_of_expression][:newlines]
+
+          case {start_line, end_line, new_lines} do
             {start_line, end_line, new_lines}
             when end_line - start_line > 0 or new_lines > 1 ->
               %{
