@@ -5,7 +5,7 @@ defmodule Eunomo do
   The sorting does not happen globally. Instead each "block" is sorted separately. An "block" is a
   set of expressions that are _not_ separated by at least one empty newline or other
   non-(alias,import,require) expressions. Note that the file is first formatter by the default
-  Elixir code formatter!
+  Elixir code formatter! All directly preceding comment lines are sorted as part of the expression.
 
   Only the order of lines is modified by this formatter. Neither the overall number of lines nor the
   content of a single line will change.
@@ -37,9 +37,13 @@ defmodule Eunomo do
 
   Sorting only alias expressions:
       iex> code_snippet = \"\"\"
+      ...> # Comment 1
       ...> alias Eunomo.Z.{L, I}
       ...> alias Eunomo.Z
+      ...> # Comment 2
+      ...> # Comment 2.1
       ...> alias __MODULE__.B
+      ...> # Comment 3
       ...> alias __MODULE__.A
       ...> alias Eunomo.C
       ...> alias Eunomo.{
@@ -47,16 +51,21 @@ defmodule Eunomo do
       ...>   B,
       ...>   # test
       ...> }
-      ...> \\nalias Eunomo.PG.Repo
+      ...> \\n# Comment 4
+      ...> alias Eunomo.PG.Repo
       ...> alias A
       ...> alias Eunomo.Patient
       ...> \"\"\"
       ...> Eunomo.format(code_snippet, [eunomo_opts: [sort_alias: true]])
       \"\"\"
+      # Comment 3
       alias __MODULE__.A
+      # Comment 2
+      # Comment 2.1
       alias __MODULE__.B
       alias Eunomo.C
       alias Eunomo.Z
+      # Comment 1
       alias Eunomo.Z.{L, I}
       \\nalias Eunomo.{
         L,
@@ -65,6 +74,7 @@ defmodule Eunomo do
       }
       \\nalias A
       alias Eunomo.Patient
+      # Comment 4
       alias Eunomo.PG.Repo
       \"\"\"
 
@@ -153,6 +163,8 @@ defmodule Eunomo do
     # hence we have to explicitly call the Elixir formatter here.
     |> elixir_format(opts)
     |> eunomo_format(opts)
+    # Necessary because of bug in Elixir parser & newline meta data. See: TODO
+    |> elixir_format(opts)
   end
 
   defp eunomo_format(content, opts) do

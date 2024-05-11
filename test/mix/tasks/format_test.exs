@@ -300,4 +300,270 @@ defmodule Mix.Tasks.FormatTest do
       end
     end)
   end
+
+  test "comments are not deleted", context do
+    in_tmp(context.test, fn ->
+      File.write!("a.ex", """
+      defmodule Foo do
+        # alias Eunomo
+        alias Eunomo.A
+
+        alias Eunomo.AA
+        alias Eunomo.CC
+        # alias Eunomo.B
+        alias Eunomo.C
+        alias Eunomo.{A, D,  B }
+        # alias Eunomo.D
+
+        alias Eunomo.CC
+        # alias Eunomo.B
+        alias Eunomo.C
+
+        def fun(x), do: x
+      end
+      """)
+
+      File.write!(".formatter.exs", """
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+      ]
+      """)
+
+      Mix.Tasks.Format.run(["a.ex"])
+
+      assert Mix.Tasks.Format.run(["a.ex", "--check-formatted"]) == :ok
+
+      assert File.read!("a.ex") == """
+             defmodule Foo do
+               # alias Eunomo
+               alias Eunomo.A
+
+               alias Eunomo.AA
+               # alias Eunomo.B
+               alias Eunomo.C
+               alias Eunomo.CC
+               alias Eunomo.{A, D, B}
+               # alias Eunomo.D
+
+               # alias Eunomo.B
+               alias Eunomo.C
+               alias Eunomo.CC
+
+               def fun(x), do: x
+             end
+             """
+    end)
+  end
+
+  test "comment with new line works", context do
+    in_tmp(context.test, fn ->
+      File.write!("a.ex", """
+      defmodule Foo do
+        # alias Eunomo
+        import C
+        # sfsdf
+        import D
+
+        # sdfdsf
+        import A
+
+        def fun(x), do: x
+      end
+      """)
+
+      File.write!(".formatter.exs", """
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+      ]
+      """)
+
+      assert Mix.Tasks.Format.run(["a.ex", "--check-formatted"]) == :ok
+    end)
+  end
+
+  test "comment with multiple new lines works", context do
+    in_tmp(context.test, fn ->
+      File.write!("a.ex", """
+      defmodule Foo do
+        # sfsdf
+        import D
+        # alias Eunomo
+        import C
+
+
+
+
+
+        # sdfdsf
+        # sdfdsf2
+        import A
+
+        def fun(x), do: x
+      end
+      """)
+
+      File.write!(".formatter.exs", """
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+      ]
+      """)
+
+      Mix.Tasks.Format.run(["a.ex"])
+
+      assert Mix.Tasks.Format.run(["a.ex", "--check-formatted"]) == :ok
+
+      assert File.read!("a.ex") == """
+             defmodule Foo do
+               # alias Eunomo
+               import C
+               # sfsdf
+               import D
+
+               # sdfdsf
+               # sdfdsf2
+               import A
+
+               def fun(x), do: x
+             end
+             """
+    end)
+  end
+
+  test "comments in block end and start position work", context do
+    in_tmp(context.test, fn ->
+      File.write!("a.ex", """
+      defmodule Foo do
+        # alias Eunomo
+        alias Eunomo.A
+
+        alias Eunomo.AA
+        # alias Eunomo.B
+        alias Eunomo.C
+        alias Eunomo.CC
+        alias Eunomo.{A, D, B}
+        # alias Eunomo.D
+
+        # alias Eunomo.B
+        alias Eunomo.EC
+        alias Eunomo.ECC
+
+        def fun(x), do: x
+      end
+      """)
+
+      File.write!(".formatter.exs", """
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+      ]
+      """)
+
+      Mix.Tasks.Format.run(["a.ex"])
+
+      assert Mix.Tasks.Format.run(["a.ex", "--check-formatted"]) == :ok
+
+      assert File.read!("a.ex") == """
+             defmodule Foo do
+               # alias Eunomo
+               alias Eunomo.A
+
+               alias Eunomo.AA
+               # alias Eunomo.B
+               alias Eunomo.C
+               alias Eunomo.CC
+               alias Eunomo.{A, D, B}
+               # alias Eunomo.D
+
+               # alias Eunomo.B
+               alias Eunomo.EC
+               alias Eunomo.ECC
+
+               def fun(x), do: x
+             end
+             """
+    end)
+  end
+
+  test "test from https://github.com/Roberto-XY/eunomo/issues/21", context do
+    in_tmp(context.test, fn ->
+      File.write!("a.ex", """
+      defmodule Foo do
+        alias A
+        alias B
+        # Comment 1
+        alias C
+        alias D
+        alias E
+      end
+      """)
+
+      File.write!(".formatter.exs", """
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+      ]
+      """)
+
+      Mix.Tasks.Format.run(["a.ex"])
+
+      assert Mix.Tasks.Format.run(["a.ex", "--check-formatted"]) == :ok
+
+      assert File.read!("a.ex") == """
+             defmodule Foo do
+               alias A
+               alias B
+               # Comment 1
+               alias C
+               alias D
+               alias E
+             end
+             """
+    end)
+  end
+
+  test "test from https://github.com/Roberto-XY/eunomo/issues/22", context do
+    in_tmp(context.test, fn ->
+      File.write!("a.ex", """
+      defmodule Foo do
+        # Comment 1
+        import Phoenix.C
+        # Comment 2
+        import Phoenix.L
+        # Comment 3
+        import Plug.Conn
+      end
+      """)
+
+      File.write!(".formatter.exs", """
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+      ]
+      """)
+
+      Mix.Tasks.Format.run(["a.ex"])
+
+      assert Mix.Tasks.Format.run(["a.ex", "--check-formatted"]) == :ok
+
+      assert File.read!("a.ex") == """
+             defmodule Foo do
+               # Comment 1
+               import Phoenix.C
+               # Comment 2
+               import Phoenix.L
+               # Comment 3
+               import Plug.Conn
+             end
+             """
+    end)
+  end
 end

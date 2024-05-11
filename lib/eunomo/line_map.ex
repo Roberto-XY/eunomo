@@ -41,4 +41,54 @@ defmodule Eunomo.LineMap do
     |> to_code_string()
     |> Code.string_to_quoted!(columns: true, token_metadata: true)
   end
+
+  @spec comments(t) :: t
+  def comments(line_map) when is_map(line_map) do
+    Map.filter(line_map, fn {_, line} -> String.trim(line) |> String.starts_with?("#") end)
+  end
+
+  @spec new_lines(t) :: t
+  def new_lines(line_map) when is_map(line_map) do
+    Map.filter(line_map, fn {_, line} -> String.trim(line) == "" end)
+  end
+
+  @spec get_continuous_block_backwards(t, line_number) :: %{optional(line_number) => iodata}
+  def get_continuous_block_backwards(line_map, n) do
+    do_get_continuous_block_backwards(line_map, n)
+  end
+
+  @spec do_get_continuous_block_backwards(t, line_number, t) :: %{optional(line_number) => iodata}
+  defp do_get_continuous_block_backwards(line_map, n, acc \\ %{}) do
+    if Map.has_key?(line_map, n) do
+      new_acc = Map.put(acc, n, Map.fetch!(line_map, n))
+      do_get_continuous_block_backwards(line_map, n - 1, new_acc)
+    else
+      acc
+    end
+  end
+
+  @spec get_continuous_block_forwards(t, line_number, iodata) :: %{
+          optional(line_number) => iodata
+        }
+  def get_continuous_block_forwards(line_map, n, stop_on) do
+    do_get_continuous_block_forwards(line_map, n, stop_on)
+  end
+
+  @spec do_get_continuous_block_forwards(t, line_number, iodata, t) :: %{
+          optional(line_number) => iodata
+        }
+  defp do_get_continuous_block_forwards(line_map, n, stop_on, acc \\ %{}) do
+    if Map.has_key?(line_map, n) do
+      elem = Map.fetch!(line_map, n)
+      new_acc = Map.put(acc, n, elem)
+
+      if elem == stop_on do
+        new_acc
+      else
+        do_get_continuous_block_forwards(line_map, n + 1, stop_on, new_acc)
+      end
+    else
+      acc
+    end
+  end
 end
