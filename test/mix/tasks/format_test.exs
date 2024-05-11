@@ -2,7 +2,9 @@
 Code.require_file("../../upstream_test_helper.exs", __DIR__)
 
 defmodule Mix.Tasks.FormatTest do
-  use MixTest.Case
+  use MixTest.Case, async: true
+
+  alias Mix
 
   @content """
   defmodule Foo do

@@ -103,13 +103,14 @@ defmodule Eunomo.ExpressionSorter do
           {triple, acc}
       end)
 
-    mapped_values = Map.values(res) |> MapSet.new()
+    mapped_values = res |> Map.values() |> MapSet.new()
 
     if length(Map.values(res)) != MapSet.size(mapped_values) do
       raise LineModificationConflict
     end
 
-    Enum.map(res, fn {old_line_n, new_line_n} ->
+    res
+    |> Enum.map(fn {old_line_n, new_line_n} ->
       {new_line_n, Map.fetch!(line_map, old_line_n)}
     end)
     |> Enum.into(%{})
@@ -189,7 +190,7 @@ defmodule Eunomo.ExpressionSorter do
                                                           {acc, current_line} ->
         comment_line_count = map_size(Keyword.get(meta, :preceding_comments, %{}))
         from = Keyword.fetch!(meta, :line) - comment_line_count
-        to = Keyword.get(meta, :end_of_expression, line: from) |> Keyword.fetch!(:line)
+        to = meta |> Keyword.get(:end_of_expression, line: from) |> Keyword.fetch!(:line)
 
         {inner_acc, current_line} =
           range_to_modification(from..to, current_line)

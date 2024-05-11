@@ -60,8 +60,7 @@ defmodule Eunomo.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      format!: ["format", "credo --strict"],
-      test_all: ["test", "cmd ./test/priv/run_upstream_tests.sh"]
+      format!: ["format", "credo --strict"]
     ]
   end
 end

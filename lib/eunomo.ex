@@ -159,12 +159,11 @@ defmodule Eunomo do
     # Elixir formatter plugin system checks if a file matches a plugin file extension and then
     # dispatches to a matching formatter. In current main (>1.14.1) that is already expanded by
     # allowing multiple formatters formatting the same file extension after each other
-    # (https://github.com/elixir-lang/elixir/pull/12032). But .ex and .exs files do not allow this,
-    # hence we have to explicitly call the Elixir formatter here.
+    # (https://github.com/elixir-lang/elixir/pull/12032). But .ex and .exs files do not allow
+    # this, hence we have to explicitly call the Elixir formatter here, so that the other
+    # formatting rules are still applied.
     |> elixir_format(opts)
     |> eunomo_format(opts)
-    # Necessary because of bug in Elixir parser & newline meta data. See: TODO
-    |> elixir_format(opts)
   end
 
   defp eunomo_format(content, opts) do

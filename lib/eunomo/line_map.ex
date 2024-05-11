@@ -44,7 +44,12 @@ defmodule Eunomo.LineMap do
 
   @spec comments(t) :: t
   def comments(line_map) when is_map(line_map) do
-    Map.filter(line_map, fn {_, line} -> String.trim(line) |> String.starts_with?("#") end)
+    line_map
+    |> Map.filter(fn {_, line} ->
+      line
+      |> String.trim()
+      |> String.starts_with?("#")
+    end)
   end
 
   @spec new_lines(t) :: t
