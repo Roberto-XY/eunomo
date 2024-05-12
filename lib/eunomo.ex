@@ -80,8 +80,11 @@ defmodule Eunomo do
 
   Sorting only import expressions:
       iex> code_snippet = \"\"\"
+      ...> # Comment 1
       ...> import Eunomo.Z.{L, I}
       ...> import Eunomo.Z, only: [hello_world: 0]
+      ...> # Comment 2
+      ...> # Comment 2.1
       ...> import B, expect: [callback: 1]
       ...> import Eunomo.C
       ...> import Eunomo.{
@@ -95,9 +98,12 @@ defmodule Eunomo do
       ...> \"\"\"
       ...> Eunomo.format(code_snippet, [eunomo_opts: [sort_import: true]])
       \"\"\"
+      # Comment 2
+      # Comment 2.1
       import B, expect: [callback: 1]
       import Eunomo.C
       import Eunomo.Z, only: [hello_world: 0]
+      # Comment 1
       import Eunomo.Z.{L, I}
       \\nimport Eunomo.{
         L,
@@ -112,8 +118,11 @@ defmodule Eunomo do
 
   Sorting only require expressions:
       iex> code_snippet = \"\"\"
+      ...> # Comment 1
       ...> require Eunomo.Z.{L, I}
       ...> require Eunomo.Z
+      ...> # Comment 2
+      ...> # Comment 2.1
       ...> require Eunomo.C
       ...> require Eunomo.{
       ...>   L,
@@ -126,8 +135,11 @@ defmodule Eunomo do
       ...> \"\"\"
       ...> Eunomo.format(code_snippet, [eunomo_opts: [sort_require: true]])
       \"\"\"
+      # Comment 2
+      # Comment 2.1
       require Eunomo.C
       require Eunomo.Z
+      # Comment 1
       require Eunomo.Z.{L, I}
       \\nrequire Eunomo.{
         L,
