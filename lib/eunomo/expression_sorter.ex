@@ -185,8 +185,7 @@ defmodule Eunomo.ExpressionSorter do
         end)
         |> Enum.min(fn -> 0 end)
 
-      inner_acc =
-        expression_block_to_modification(expression_block, first_line, split_expression)
+      inner_acc = expression_block_to_modification(expression_block, first_line, split_expression)
 
       Map.merge(acc, inner_acc, fn _, _, _ -> raise LineModificationConflict end)
     end)
@@ -204,8 +203,7 @@ defmodule Eunomo.ExpressionSorter do
         from = Keyword.fetch!(meta, :line) - comment_line_count
         to = meta |> Keyword.get(:end_of_expression, line: from) |> Keyword.fetch!(:line)
 
-        {inner_acc, current_line} =
-          range_to_modification(from..to, current_line)
+        {inner_acc, current_line} = range_to_modification(from..to, current_line)
 
         acc = Map.merge(acc, inner_acc, fn _, _, _ -> raise LineModificationConflict end)
 
