@@ -168,15 +168,26 @@ defmodule Eunomo do
   @impl true
   @spec format(String.t(), Keyword.t()) :: String.t()
   def format(content, opts) do
-    content
     # Elixir formatter plugin system checks if a file matches a plugin file extension and then
     # dispatches to a matching formatter. In current main (>1.14.1) that is already expanded by
     # allowing multiple formatters formatting the same file extension after each other
     # (https://github.com/elixir-lang/elixir/pull/12032). But .ex and .exs files do not allow
     # this, hence we have to explicitly call the Elixir formatter here, so that the other
-    # formatting rules are still applied.
-    |> elixir_format(opts)
-    |> eunomo_format(opts)
+    # formatting rules are still applied.s
+    elixir_formatted_content = elixir_format(content, opts)
+    eunomo_formatted_content = eunomo_format(elixir_formatted_content, opts)
+
+    if String.length(eunomo_formatted_content) != String.length(elixir_formatted_content) do
+      IO.puts("""
+      Please report a bug here: https://github.com/Roberto-XY/eunomo
+      Formatted content has different length than original content in '#{Keyword.get(opts, :file)}'
+      Eunomo did not format this file to avoid unexpected behavior.
+      """)
+
+      elixir_formatted_content
+    else
+      eunomo_formatted_content
+    end
   end
 
   defp eunomo_format(content, opts) do

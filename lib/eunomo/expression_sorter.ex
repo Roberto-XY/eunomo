@@ -10,8 +10,8 @@ defmodule Eunomo.ExpressionSorter do
     @moduledoc false
 
     defexception message: """
-                   Please report a bug.
-                   Same line got mapped twice in `Eunomo.ExpressionSorter`.
+                 Please report a bug here: https://github.com/Roberto-XY/eunomo
+                 Same line got mapped twice in `Eunomo.ExpressionSorter`.
                  """
   end
 
