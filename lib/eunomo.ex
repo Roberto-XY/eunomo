@@ -5,10 +5,11 @@ defmodule Eunomo do
   The sorting does not happen globally. Instead each "block" is sorted separately. An "block" is a
   set of expressions that are _not_ separated by at least one empty newline or other
   non-(alias,import,require) expressions. Note that the file is first formatter by the default
-  Elixir code formatter! All directly preceding comment lines are sorted as part of the expression.
+  Elixir code formatter! All directly preceding comment lines are sorted as part of the
+  expression.
 
-  Only the order of lines is modified by this formatter. Neither the overall number of lines nor the
-  content of a single line will change.
+  Only the order of lines is modified by this formatter. Neither the overall number of lines nor
+  the content of a single line will change.
 
   Besides the options `Code.format_string!/2` and `Mix.Tasks.Format`, the `.formatter.exs` file
   supports the following Eunomo specific options:

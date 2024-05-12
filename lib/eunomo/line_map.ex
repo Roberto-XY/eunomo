@@ -1,16 +1,15 @@
 defmodule Eunomo.LineMap do
   @moduledoc false
 
-  # Super simple text abstraction. Maps a line_number to an iodata chunk.
-  # Possibly to naive for complex transformations -
-  # just right for `alias`, `import` and `require sorting.
-  # Performance was not a design consideration.
+  # Super simple text abstraction. Maps a line_number to an iodata chunk. Possibly too naive for
+  # complex transformations - just right for `alias`, `import` and `require sorting. Performance
+  # was not a design consideration.
 
   @type line_number :: non_neg_integer
 
   @typedoc """
-  Invariant that should hold: sorted_key_set == 1..length(line_map) so that the `Eunomo.LineMap` is total
-  i.e. every line number is present.
+  Invariant that should hold: sorted_key_set == 1..length(line_map) so that the `Eunomo.LineMap`
+  is total i.e. every line number is present.
   """
   @type t :: %{optional(line_number) => iodata}
 

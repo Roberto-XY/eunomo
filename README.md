@@ -50,5 +50,5 @@ Eunomo plugins.
 Before Elixir version `1.13.0`, there was no way to hook plugins into the default formatter. Hence
 two Mix tasks were provided: [`mix
 eunomo.gen.config`](https://hexdocs.pm/eunomo/0.1.3/Mix.Tasks.Eunomo.Gen.Config.html) & [`mix
-eunomo`](https://hexdocs.pm/eunomo/0.1.3/Mix.Tasks.Eunomo.html#content). This approach does not play
-nicely with umbrella applications.
+eunomo`](https://hexdocs.pm/eunomo/0.1.3/Mix.Tasks.Eunomo.html#content). This approach does not
+play nicely with umbrella applications.
