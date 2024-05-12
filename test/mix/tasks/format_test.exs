@@ -442,7 +442,12 @@ defmodule Mix.Tasks.FormatTest do
       File.write!("a.ex", """
       defmodule Foo do
         # alias Eunomo
+        alias Eunomo.B
         alias Eunomo.A
+        # alias Eunomo.D
+        # alias Eunomo.D
+
+        # alias Eunomo.D
 
         alias Eunomo.AA
         # alias Eunomo.B
@@ -454,6 +459,7 @@ defmodule Mix.Tasks.FormatTest do
         # alias Eunomo.B
         alias Eunomo.EC
         alias Eunomo.ECC
+        # alias Eunomo.D
 
         def fun(x), do: x
       end
@@ -473,8 +479,13 @@ defmodule Mix.Tasks.FormatTest do
 
       assert File.read!("a.ex") == """
              defmodule Foo do
-               # alias Eunomo
                alias Eunomo.A
+               # alias Eunomo
+               alias Eunomo.B
+               # alias Eunomo.D
+               # alias Eunomo.D
+
+               # alias Eunomo.D
 
                alias Eunomo.AA
                # alias Eunomo.B
@@ -486,6 +497,7 @@ defmodule Mix.Tasks.FormatTest do
                # alias Eunomo.B
                alias Eunomo.EC
                alias Eunomo.ECC
+               # alias Eunomo.D
 
                def fun(x), do: x
              end

@@ -93,22 +93,22 @@ defmodule Eunomo.ExpressionSorter do
       next_line_number = Keyword.fetch!(end_of_expression, :line) + 1
 
       if Map.has_key?(new_lines_and_comments, next_line_number) do
-        # Take newlines ore comment lines until next new line
-        new_line_block =
+        # Take new lines or comment lines until the next new line is encountered
+        new_or_comment_line_block =
           LineMap.get_continuous_block_forwards(
             new_lines_and_comments,
             next_line_number,
             _stop_on = ""
           )
 
-        # The last line must be a new line, otherwise we have only comments which do not indicate
-        # the start of a new block
-        {_, last} = Enum.max_by(new_line_block, fn {key, _} -> key end)
+        # The last line must be a new line, otherwise we have only comments. Which would not
+        # indicate the start of a new block
+        {_, last_line_in_block} = Enum.max_by(new_or_comment_line_block, fn {key, _} -> key end)
 
-        if last == "" do
+        if last_line_in_block == "" do
           new_meta =
             update_in(meta, [:end_of_expression, :newlines], fn _ ->
-              map_size(new_line_block) + 1
+              map_size(new_or_comment_line_block) + 1
             end)
 
           {atom, new_meta, args}

@@ -57,12 +57,12 @@ defmodule Eunomo.LineMap do
     Map.filter(line_map, fn {_, line} -> String.trim(line) == "" end)
   end
 
-  @spec get_continuous_block_backwards(t, line_number) :: %{optional(line_number) => iodata}
+  @spec get_continuous_block_backwards(t, line_number) :: t
   def get_continuous_block_backwards(line_map, n) do
     do_get_continuous_block_backwards(line_map, n)
   end
 
-  @spec do_get_continuous_block_backwards(t, line_number, t) :: %{optional(line_number) => iodata}
+  @spec do_get_continuous_block_backwards(t, line_number, t) :: t
   defp do_get_continuous_block_backwards(line_map, n, acc \\ %{}) do
     if Map.has_key?(line_map, n) do
       new_acc = Map.put(acc, n, Map.fetch!(line_map, n))
@@ -72,16 +72,12 @@ defmodule Eunomo.LineMap do
     end
   end
 
-  @spec get_continuous_block_forwards(t, line_number, iodata) :: %{
-          optional(line_number) => iodata
-        }
+  @spec get_continuous_block_forwards(t, line_number, iodata) :: t
   def get_continuous_block_forwards(line_map, n, stop_on) do
     do_get_continuous_block_forwards(line_map, n, stop_on)
   end
 
-  @spec do_get_continuous_block_forwards(t, line_number, iodata, t) :: %{
-          optional(line_number) => iodata
-        }
+  @spec do_get_continuous_block_forwards(t, line_number, iodata, t) :: t
   defp do_get_continuous_block_forwards(line_map, n, stop_on, acc \\ %{}) do
     if Map.has_key?(line_map, n) do
       elem = Map.fetch!(line_map, n)
