@@ -5,10 +5,11 @@ defmodule Eunomo do
   The sorting does not happen globally. Instead each "block" is sorted separately. An "block" is a
   set of expressions that are _not_ separated by at least one empty newline or other
   non-(alias,import,require) expressions. Note that the file is first formatter by the default
-  Elixir code formatter!
+  Elixir code formatter! All directly preceding comment lines are sorted as part of the
+  expression.
 
-  Only the order of lines is modified by this formatter. Neither the overall number of lines nor the
-  content of a single line will change.
+  Only the order of lines is modified by this formatter. Neither the overall number of lines nor
+  the content of a single line will change.
 
   Besides the options `Code.format_string!/2` and `Mix.Tasks.Format`, the `.formatter.exs` file
   supports the following Eunomo specific options:
@@ -37,9 +38,13 @@ defmodule Eunomo do
 
   Sorting only alias expressions:
       iex> code_snippet = \"\"\"
+      ...> # Comment 1
       ...> alias Eunomo.Z.{L, I}
       ...> alias Eunomo.Z
+      ...> # Comment 2
+      ...> # Comment 2.1
       ...> alias __MODULE__.B
+      ...> # Comment 3
       ...> alias __MODULE__.A
       ...> alias Eunomo.C
       ...> alias Eunomo.{
@@ -47,16 +52,21 @@ defmodule Eunomo do
       ...>   B,
       ...>   # test
       ...> }
-      ...> \\nalias Eunomo.PG.Repo
+      ...> \\n# Comment 4
+      ...> alias Eunomo.PG.Repo
       ...> alias A
       ...> alias Eunomo.Patient
       ...> \"\"\"
       ...> Eunomo.format(code_snippet, [eunomo_opts: [sort_alias: true]])
       \"\"\"
+      # Comment 3
       alias __MODULE__.A
+      # Comment 2
+      # Comment 2.1
       alias __MODULE__.B
       alias Eunomo.C
       alias Eunomo.Z
+      # Comment 1
       alias Eunomo.Z.{L, I}
       \\nalias Eunomo.{
         L,
@@ -65,13 +75,17 @@ defmodule Eunomo do
       }
       \\nalias A
       alias Eunomo.Patient
+      # Comment 4
       alias Eunomo.PG.Repo
       \"\"\"
 
   Sorting only import expressions:
       iex> code_snippet = \"\"\"
+      ...> # Comment 1
       ...> import Eunomo.Z.{L, I}
       ...> import Eunomo.Z, only: [hello_world: 0]
+      ...> # Comment 2
+      ...> # Comment 2.1
       ...> import B, expect: [callback: 1]
       ...> import Eunomo.C
       ...> import Eunomo.{
@@ -85,9 +99,12 @@ defmodule Eunomo do
       ...> \"\"\"
       ...> Eunomo.format(code_snippet, [eunomo_opts: [sort_import: true]])
       \"\"\"
+      # Comment 2
+      # Comment 2.1
       import B, expect: [callback: 1]
       import Eunomo.C
       import Eunomo.Z, only: [hello_world: 0]
+      # Comment 1
       import Eunomo.Z.{L, I}
       \\nimport Eunomo.{
         L,
@@ -102,8 +119,11 @@ defmodule Eunomo do
 
   Sorting only require expressions:
       iex> code_snippet = \"\"\"
+      ...> # Comment 1
       ...> require Eunomo.Z.{L, I}
       ...> require Eunomo.Z
+      ...> # Comment 2
+      ...> # Comment 2.1
       ...> require Eunomo.C
       ...> require Eunomo.{
       ...>   L,
@@ -116,8 +136,11 @@ defmodule Eunomo do
       ...> \"\"\"
       ...> Eunomo.format(code_snippet, [eunomo_opts: [sort_require: true]])
       \"\"\"
+      # Comment 2
+      # Comment 2.1
       require Eunomo.C
       require Eunomo.Z
+      # Comment 1
       require Eunomo.Z.{L, I}
       \\nrequire Eunomo.{
         L,
@@ -149,8 +172,9 @@ defmodule Eunomo do
     # Elixir formatter plugin system checks if a file matches a plugin file extension and then
     # dispatches to a matching formatter. In current main (>1.14.1) that is already expanded by
     # allowing multiple formatters formatting the same file extension after each other
-    # (https://github.com/elixir-lang/elixir/pull/12032). But .ex and .exs files do not allow this,
-    # hence we have to explicitly call the Elixir formatter here.
+    # (https://github.com/elixir-lang/elixir/pull/12032). But .ex and .exs files do not allow
+    # this, hence we have to explicitly call the Elixir formatter here, so that the other
+    # formatting rules are still applied.
     |> elixir_format(opts)
     |> eunomo_format(opts)
   end

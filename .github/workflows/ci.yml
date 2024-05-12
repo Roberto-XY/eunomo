@@ -12,26 +12,24 @@ jobs:
     strategy:
       matrix:
         include:
-          - otp: "22.x"
-            elixir: "1.13.4"
           - otp: "25.x"
             elixir: "1.13.4"
-          - otp: "23.x"
-            elixir: "1.14.1"
           - otp: "25.x"
-            elixir: "1.14.1"
+            elixir: "1.14.5"
           - otp: "26.x"
             elixir: "1.15.7"
-    runs-on: ubuntu-20.04
+          - otp: "26.x"
+            elixir: "1.16.2"
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
 
       - name: Cache mix dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: deps
           key: ${{ runner.os }}-${{ matrix.elixir }}-mix-${{ hashFiles('**/mix.lock') }}
@@ -39,6 +37,9 @@ jobs:
 
       - name: Install Dependencies
         run: mix deps.get
+
+      - name: Compile App
+        run: mix compile
 
       - name: Run formatter
         run: mix format --check-formatted
@@ -50,7 +51,7 @@ jobs:
         run: mix docs
 
       - name: Run Tests
-        run: mix test_all
+        run: mix test
 
       - name: Run dialyzer
         run: mix dialyzer

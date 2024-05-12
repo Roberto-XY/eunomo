@@ -1,11 +1,11 @@
-# Upstream copied from https://github.com/elixir-lang/elixir/blob/v1.14.1/lib/mix/test/mix/tasks/format_test.exs
+# Upstream copied from https://github.com/elixir-lang/elixir/blob/v1.16.2/lib/mix/test/mix/tasks/format_test.exs
 # And added Eunomo plugin config to all formatters, there should be no difference in outcome
 # credo:disable-for-this-file
 
 Code.require_file("../../upstream_test_helper.exs", __DIR__)
 
 defmodule Mix.Tasks.UpstreamFormatTest do
-  use MixTest.Case
+  use MixTest.Case, async: true
 
   import ExUnit.CaptureIO
 
@@ -19,7 +19,7 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "doesn't format empty files into line breaks", context do
     in_tmp(context.test, fn ->
       File.write!("a.exs", "")
@@ -32,7 +32,7 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "formats the given files", context do
     in_tmp(context.test, fn ->
       File.write!("a.ex", """
@@ -47,7 +47,7 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "formats the given pattern", context do
     in_tmp(context.test, fn ->
       File.write!("a.ex", """
@@ -62,7 +62,7 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "is a no-op if the file is already formatted", context do
     in_tmp(context.test, fn ->
       File.write!("a.ex", """
@@ -75,7 +75,7 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "does not write file to disk on dry-run", context do
     in_tmp(context.test, fn ->
       File.write!("a.ex", """
@@ -90,7 +90,18 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
+  test "does not try to format a directory that matches a given pattern", context do
+    in_tmp(context.test, fn ->
+      File.mkdir_p!("a.ex")
+
+      assert_raise Mix.Error, ~r"Could not find a file to format", fn ->
+        Mix.Tasks.Format.run(["*.ex"])
+      end
+    end)
+  end
+
+  @tag :upstream
   test "reads file from stdin and prints to stdout", context do
     in_tmp(context.test, fn ->
       File.write!("a.ex", """
@@ -112,7 +123,7 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "reads file from stdin and prints to stdout with formatter", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
@@ -134,7 +145,7 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "checks if file is formatted with --check-formatted", context do
     in_tmp(context.test, fn ->
       File.write!("a.ex", """
@@ -158,7 +169,7 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "checks if stdin is formatted with --check-formatted" do
     assert_raise Mix.Error, ~r"mix format failed due to --check-formatted", fn ->
       capture_io("foo( )", fn ->
@@ -174,7 +185,23 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     assert output == ""
   end
 
-  @tag upstream: true
+  @tag :upstream
+  test "checks that no error is raised with --check-formatted and --no-exit" do
+    capture_io("foo( )", fn ->
+      Mix.Tasks.Format.run(["--check-formatted", "--no-exit", "-"])
+    end)
+
+    assert_received {:mix_shell, :info, ["The following files are not formatted" <> _]}
+  end
+
+  @tag :upstream
+  test "raises an error if --no-exit is passed without --check-formatted" do
+    assert_raise Mix.Error, ~r"--no-exit can only be used together", fn ->
+      Mix.Tasks.Format.run(["--no-exit", "-"])
+    end
+  end
+
+  @tag :upstream
   test "uses inputs and configuration from .formatter.exs", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
@@ -198,7 +225,7 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "does not cache inputs from .formatter.exs", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
@@ -232,7 +259,7 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "expands patterns in inputs from .formatter.exs", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
@@ -281,7 +308,7 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "uses sigil plugins from .formatter.exs", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
@@ -312,6 +339,24 @@ defmodule Mix.Tasks.UpstreamFormatTest do
                '''abc
              end
              """
+
+      {formatter_function, _options} = Mix.Tasks.Format.formatter_for_file("a.ex")
+
+      assert formatter_function.("""
+             if true do
+               ~W'''
+               foo bar baz
+               '''abc
+             end
+             """) == """
+             if true do
+               ~W'''
+               foo
+               bar
+               baz
+               '''abc
+             end
+             """
     end)
   end
 
@@ -333,7 +378,38 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end
   end
 
-  @tag upstream: true
+  defmodule Elixir.NewlineToDotPlugin do
+    @behaviour Mix.Tasks.Format
+
+    def features(opts) do
+      assert opts[:from_formatter_exs] == :yes
+      [extensions: ~w(.w), sigils: [:W]]
+    end
+
+    def format(contents, opts) do
+      assert opts[:from_formatter_exs] == :yes
+
+      cond do
+        opts[:extension] ->
+          assert opts[:extension] == ".w"
+          assert opts[:file] =~ ~r/\/a\.w$/
+          assert [W: sigil_fun] = opts[:sigils]
+          assert is_function(sigil_fun, 2)
+
+        opts[:sigil] ->
+          assert opts[:sigil] == :W
+          assert opts[:inputs] == ["a.ex"]
+          assert opts[:modifiers] == ~c"abc"
+
+        true ->
+          flunk("Plugin not loading in correctly.")
+      end
+
+      contents |> String.replace("\n", ".")
+    end
+  end
+
+  @tag :upstream
   test "uses extension plugins from .formatter.exs", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
@@ -359,7 +435,109 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
+  test "uses multiple plugins from .formatter.exs targeting the same file extension", context do
+    in_tmp(context.test, fn ->
+      File.write!(".formatter.exs", """
+      [
+        inputs: ["a.w"],
+        plugins: [ExtensionWPlugin, NewlineToDotPlugin, Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        from_formatter_exs: :yes
+      ]
+      """)
+
+      File.write!("a.w", """
+      foo bar baz
+      """)
+
+      Mix.Tasks.Format.run([])
+
+      assert File.read!("a.w") == "foo.bar.baz."
+    end)
+  end
+
+  @tag :upstream
+  test "uses multiple plugins from .formatter.exs with the same file extension in declared order",
+       context do
+    in_tmp(context.test, fn ->
+      File.write!(".formatter.exs", """
+      [
+        inputs: ["a.w"],
+        plugins: [NewlineToDotPlugin, ExtensionWPlugin, Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        from_formatter_exs: :yes
+      ]
+      """)
+
+      File.write!("a.w", """
+      foo bar baz
+      """)
+
+      Mix.Tasks.Format.run([])
+
+      assert File.read!("a.w") == "foo\nbar\nbaz."
+    end)
+  end
+
+  @tag :upstream
+  test "uses multiple plugins from .formatter.exs targeting the same sigil", context do
+    in_tmp(context.test, fn ->
+      File.write!(".formatter.exs", """
+      [
+        inputs: ["a.ex"],
+        plugins: [NewlineToDotPlugin, SigilWPlugin, Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        from_formatter_exs: :yes
+      ]
+      """)
+
+      File.write!("a.ex", """
+      def sigil_test(assigns) do
+        ~W"foo bar baz\n"abc
+      end
+      """)
+
+      Mix.Tasks.Format.run([])
+
+      assert File.read!("a.ex") == """
+             def sigil_test(assigns) do
+               ~W"foo\nbar\nbaz."abc
+             end
+             """
+    end)
+  end
+
+  @tag :upstream
+  test "uses multiple plugins from .formatter.exs with the same sigil in declared order",
+       context do
+    in_tmp(context.test, fn ->
+      File.write!(".formatter.exs", """
+      [
+        inputs: ["a.ex"],
+        plugins: [SigilWPlugin, NewlineToDotPlugin, Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        from_formatter_exs: :yes
+      ]
+      """)
+
+      File.write!("a.ex", """
+      def sigil_test(assigns) do
+        ~W"foo bar baz"abc
+      end
+      """)
+
+      Mix.Tasks.Format.run([])
+
+      assert File.read!("a.ex") == """
+             def sigil_test(assigns) do
+               ~W"foo.bar.baz"abc
+             end
+             """
+    end)
+  end
+
+  @tag :upstream
   test "uses extension plugins with --stdin-filename", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
@@ -385,13 +563,11 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "uses inputs and configuration from --dot-formatter", context do
     in_tmp(context.test, fn ->
       File.write!("custom_formatter.exs", """
       [
-        plugins: [Eunomo],
-        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
         inputs: ["a.ex"],
         locals_without_parens: [foo: 1]
       ]
@@ -409,30 +585,81 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
+  test "uses inputs and configuration from :root path", context do
+    in_tmp(context.test, fn ->
+      File.write!(".formatter.exs", """
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        locals_without_parens: [foo: 1]
+      ]
+      """)
+
+      File.mkdir_p!("lib")
+
+      File.write!("lib/a.ex", """
+      foo bar baz
+      """)
+
+      root = File.cwd!()
+
+      {formatter_function, _options} =
+        File.cd!("lib", fn ->
+          Mix.Tasks.Format.formatter_for_file("lib/a.ex", root: root)
+        end)
+
+      assert formatter_function.("""
+             foo bar baz
+             """) == """
+             foo bar(baz)
+             """
+    end)
+  end
+
+  @tag :upstream
   test "reads exported configuration from subdirectories", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
       [
         plugins: [Eunomo],
         eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
-        subdirectories: ["lib"]
+        subdirectories: ["li", "lib"]
       ]
       """)
 
+      # We also create a directory called li to ensure files
+      # from lib won't accidentally match on li.
+      File.mkdir_p!("li")
       File.mkdir_p!("lib")
+
+      File.write!("li/.formatter.exs", """
+      [
+        plugins: [Eunomo],
+        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
+        inputs: "**/*",
+        locals_without_parens: [other_fun: 2]
+      ]
+      """)
 
       File.write!("lib/.formatter.exs", """
       [
         plugins: [Eunomo],
         eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
-        inputs: "a.ex", locals_without_parens: [my_fun: 2]
+        inputs: "a.ex",
+        locals_without_parens: [my_fun: 2]
       ]
       """)
 
+      # Should hit the formatter
       {formatter, formatter_opts} = Mix.Tasks.Format.formatter_for_file("lib/extra/a.ex")
       assert Keyword.get(formatter_opts, :locals_without_parens) == [my_fun: 2]
       assert formatter.("my_fun 1, 2") == "my_fun 1, 2\n"
+
+      # Another directory should not hit the formatter
+      {formatter, formatter_opts} = Mix.Tasks.Format.formatter_for_file("test/a.ex")
+      assert Keyword.get(formatter_opts, :locals_without_parens) == []
+      assert formatter.("my_fun 1, 2") == "my_fun(1, 2)\n"
 
       File.write!("lib/a.ex", """
       my_fun :foo, :bar
@@ -472,7 +699,7 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "reads exported configuration from dependencies", context do
     in_tmp(context.test, fn ->
       Mix.Project.push(__MODULE__.FormatWithDepsApp)
@@ -519,7 +746,7 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "reads exported configuration from dependencies and subdirectories", context do
     in_tmp(context.test, fn ->
       Mix.Project.push(__MODULE__.FormatWithDepsApp)
@@ -628,7 +855,7 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "validates subdirectories in :subdirectories", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
@@ -643,11 +870,7 @@ defmodule Mix.Tasks.UpstreamFormatTest do
       assert_raise Mix.Error, message, fn -> Mix.Tasks.Format.run([]) end
 
       File.write!(".formatter.exs", """
-      [
-        plugins: [Eunomo],
-        eunomo_opts: [sort_alias: true, sort_import: true, sort_require: true],
-        subdirectories: ["lib"]
-      ]
+      [subdirectories: ["lib"]]
       """)
 
       File.mkdir_p!("lib")
@@ -659,12 +882,12 @@ defmodule Mix.Tasks.UpstreamFormatTest do
       ]
       """)
 
-      message = "Expected :inputs or :subdirectories key in lib/.formatter.exs"
+      message = "Expected :inputs or :subdirectories key in #{Path.expand("lib/.formatter.exs")}"
       assert_raise Mix.Error, message, fn -> Mix.Tasks.Format.run([]) end
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "validates dependencies in :import_deps", context do
     in_tmp(context.test, fn ->
       Mix.Project.push(__MODULE__.FormatWithDepsApp)
@@ -677,7 +900,10 @@ defmodule Mix.Tasks.UpstreamFormatTest do
       ]
       """)
 
-      assert_raise Mix.Error, fn -> Mix.Tasks.Format.run([]) end
+      message =
+        ~r"Unknown dependency :my_dep given to :import_deps in the formatter configuration"
+
+      assert_raise Mix.Error, message, fn -> Mix.Tasks.Format.run([]) end
 
       File.write!(".formatter.exs", """
       [
@@ -688,14 +914,13 @@ defmodule Mix.Tasks.UpstreamFormatTest do
       """)
 
       message =
-        "Unknown dependency :nonexistent_dep given to :import_deps in the formatter configuration. " <>
-          "The dependency is not listed in your mix.exs for environment :dev"
+        ~r"Unknown dependency :nonexistent_dep given to :import_deps in the formatter configuration"
 
       assert_raise Mix.Error, message, fn -> Mix.Tasks.Format.run([]) end
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "prints an error on conflicting .formatter.exs files", context do
     in_tmp(context.test, fn ->
       File.write!(".formatter.exs", """
@@ -734,23 +959,24 @@ defmodule Mix.Tasks.UpstreamFormatTest do
       Mix.Tasks.Format.run([])
 
       message1 =
-        "Both .formatter.exs and lib/.formatter.exs specify the file lib/a.ex in their " <>
-          ":inputs option. To resolve the conflict, the configuration in .formatter.exs " <>
-          "will be ignored. Please change the list of :inputs in one of the formatter files " <>
-          "so only one of them matches lib/a.ex"
+        "Both .formatter.exs and #{Path.expand("lib/.formatter.exs")} specify the file " <>
+          "#{Path.expand("lib/a.ex")} in their :inputs option. To resolve the conflict, " <>
+          "the configuration in .formatter.exs will be ignored. Please change the list of " <>
+          ":inputs in one of the formatter files so only one of them matches #{Path.expand("lib/a.ex")}"
 
       message2 =
-        "Both lib/.formatter.exs and foo/.formatter.exs specify the file lib/a.ex in their " <>
-          ":inputs option. To resolve the conflict, the configuration in lib/.formatter.exs " <>
+        "Both #{Path.expand("lib/.formatter.exs")} and #{Path.expand("foo/.formatter.exs")} " <>
+          "specify the file #{Path.expand("lib/a.ex")} in their :inputs option. To resolve " <>
+          "the conflict, the configuration in #{Path.expand("lib/.formatter.exs")} " <>
           "will be ignored. Please change the list of :inputs in one of the formatter files " <>
-          "so only one of them matches lib/a.ex"
+          "so only one of them matches #{Path.expand("lib/a.ex")}"
 
       assert_received {:mix_shell, :error, [^message1]}
       assert_received {:mix_shell, :error, [^message2]}
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "raises on invalid arguments", context do
     in_tmp(context.test, fn ->
       assert_raise Mix.Error, ~r"Expected one or more files\/patterns to be given", fn ->
@@ -763,31 +989,453 @@ defmodule Mix.Tasks.UpstreamFormatTest do
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "raises SyntaxError when parsing invalid source file", context do
     in_tmp(context.test, fn ->
       File.write!("a.ex", """
       defmodule <%= module %>.Bar do end
       """)
 
-      assert_raise SyntaxError, ~r"a.ex:1:13: syntax error before: '='", fn ->
-        Mix.Tasks.Format.run(["a.ex"])
+      messages = [
+        "invalid syntax found on a.ex:1:13:",
+        "defmodule <%= module %>.Bar do end",
+        "^",
+        "syntax error before: '='"
+      ]
+
+      e =
+        assert_raise SyntaxError, fn ->
+          Mix.Tasks.Format.run(["a.ex"])
+        end
+
+      output = Exception.format(:error, e, [])
+
+      for msg <- messages do
+        assert output =~ msg
       end
 
       assert_received {:mix_shell, :error, ["mix format failed for file: a.ex"]}
     end)
   end
 
-  @tag upstream: true
+  @tag :upstream
   test "raises SyntaxError when parsing invalid stdin", context do
     in_tmp(context.test, fn ->
-      assert_raise SyntaxError, ~r"stdin.exs:1:13: syntax error before: '='", fn ->
-        capture_io("defmodule <%= module %>.Bar do end", fn ->
-          Mix.Tasks.Format.run(["-"])
-        end)
+      e =
+        assert_raise SyntaxError, fn ->
+          capture_io("defmodule <%= module %>.Bar do end", fn ->
+            Mix.Tasks.Format.run(["-"])
+          end)
+        end
+
+      messages = [
+        "invalid syntax found on stdin.exs:1:13:",
+        "defmodule <%= module %>.Bar do end",
+        "^",
+        "syntax error before: '='"
+      ]
+
+      output = Exception.format(:error, e, [])
+
+      for msg <- messages do
+        assert output =~ msg
       end
 
       assert_received {:mix_shell, :error, ["mix format failed for stdin"]}
     end)
+  end
+
+  describe "text_diff_format/3" do
+    defp text_diff_format(old, new, opts \\ []) do
+      Mix.Tasks.Format.text_diff_format(old, new, opts) |> IO.iodata_to_binary()
+    end
+
+    @tag :upstream
+    test "with unchanged texts" do
+      assert text_diff_format("abc", "abc") == ""
+    end
+
+    @tag :upstream
+    test "with one deleted line" do
+      old = "del"
+      new = ""
+
+      assert output = text_diff_format(old, new)
+
+      if IO.ANSI.enabled?() do
+        assert output == "1  \e[31m -\e[0m|\e[31mdel\e[0m\n  1\e[32m +\e[0m|\n"
+      end
+
+      assert text_diff_format(old, new, color: false) == """
+             1   -|del
+               1 +|
+             """
+    end
+
+    @tag :upstream
+    test "with one changed line" do
+      old = "one three two"
+      new = "one two three"
+
+      assert output = text_diff_format(old, new)
+
+      if IO.ANSI.enabled?() do
+        assert output ==
+                 """
+                 1  \e[31m -\e[0m|one three\e[31m\e[0m\e[41m \e[0m\e[31mtwo\e[0m
+                   1\e[32m +\e[0m|one t\e[32mwo\e[0m\e[42m \e[0m\e[32mt\e[0mhree
+                 """
+      end
+
+      assert text_diff_format(old, new, color: false) == """
+             1   -|one three two
+               1 +|one two three
+             """
+    end
+
+    @tag :upstream
+    test "with one deleted line in the middle" do
+      old = """
+      aaa
+      bbb
+      ccc
+      ddd
+      eee
+      fff
+      ggg
+      """
+
+      new = """
+      aaa
+      bbb
+      ccc
+      eee
+      fff
+      ggg
+      """
+
+      exp = """
+           |
+      2 2  |bbb
+      3 3  |ccc
+      4   -|ddd
+      5 4  |eee
+      6 5  |fff
+           |
+      """
+
+      assert text_diff_format(old, new)
+      assert text_diff_format(old, new, color: false) == exp
+    end
+
+    @tag :upstream
+    test "with multiple deleted lines" do
+      old = """
+      aaa
+      bbb
+      ccc
+      ddd
+      eee
+      fff
+      ggg\
+      """
+
+      new = """
+      aaa
+      ggg\
+      """
+
+      exp = """
+      1 1  |aaa
+      2   -|bbb
+      3   -|ccc
+      4   -|ddd
+      5   -|eee
+      6   -|fff
+      7 2  |ggg
+      """
+
+      assert text_diff_format(old, new)
+      assert text_diff_format(old, new, color: false) == exp
+    end
+
+    @tag :upstream
+    test "with one added line in the middle" do
+      old = """
+      aaa
+      bbb
+      ccc
+      eee
+      fff
+      ggg
+      """
+
+      new = """
+      aaa
+      bbb
+      ccc
+      ddd
+      eee
+      fff
+      ggg
+      """
+
+      exp = """
+           |
+      2 2  |bbb
+      3 3  |ccc
+        4 +|ddd
+      4 5  |eee
+      5 6  |fff
+           |
+      """
+
+      assert text_diff_format(old, new)
+      assert text_diff_format(old, new, color: false) == exp
+    end
+
+    @tag :upstream
+    test "with changed first line" do
+      old = """
+      aaa
+      bbb
+      ccc
+      ddd
+      """
+
+      new = """
+      axa
+      bbb
+      ccc
+      ddd
+      """
+
+      exp = """
+      1   -|aaa
+        1 +|axa
+      2 2  |bbb
+      3 3  |ccc
+           |
+      """
+
+      assert text_diff_format(old, new)
+      assert text_diff_format(old, new, color: false) == exp
+    end
+
+    @tag :upstream
+    test "with changed last line" do
+      old = """
+      aaa
+      bbb
+      ccc
+      ddd
+      """
+
+      new = """
+      aaa
+      bbb
+      ccc
+      dxd
+      """
+
+      exp = """
+           |
+      2 2  |bbb
+      3 3  |ccc
+      4   -|ddd
+        4 +|dxd
+      """
+
+      assert text_diff_format(old, new)
+      assert text_diff_format(old, new, color: false) == exp
+    end
+
+    @tag :upstream
+    test "with changed first and last line" do
+      old = """
+      aaa
+      bbb
+      ccc
+      ddd
+      eee
+      """
+
+      new = """
+      axa
+      bbb
+      ccc
+      ddd
+      exe
+      """
+
+      exp = """
+      1   -|aaa
+        1 +|axa
+      2 2  |bbb
+           |
+      4 4  |ddd
+      5   -|eee
+        5 +|exe
+      """
+
+      assert text_diff_format(old, new)
+      assert text_diff_format(old, new, color: false, before: 1, after: 1) == exp
+    end
+
+    @tag :upstream
+    test "with changed second and second last line" do
+      old = """
+      aaa
+      bbb
+      ccc
+      ddd
+      eee
+      fff
+      ggg
+      hhh
+      iii\
+      """
+
+      new = """
+      aaa
+      bXb
+      ccc
+      ddd
+      eee
+      fff
+      ggg
+      hXh
+      iii\
+      """
+
+      exp = """
+      1 1  |aaa
+      2   -|bbb
+        2 +|bXb
+      3 3  |ccc
+           |
+      7 7  |ggg
+      8   -|hhh
+        8 +|hXh
+      9 9  |iii
+      """
+
+      assert text_diff_format(old, new)
+      assert text_diff_format(old, new, color: false, before: 1, after: 1) == exp
+    end
+
+    @tag :upstream
+    test "colorized added tab" do
+      assert output = text_diff_format("ab", "a\tb")
+
+      if IO.ANSI.enabled?() do
+        assert output =~ "\e[42m\t"
+      end
+    end
+
+    @tag :upstream
+    test "colorized deleted tab" do
+      assert output = text_diff_format("a\tb", "ab")
+
+      if IO.ANSI.enabled?() do
+        assert output =~ "\e[41m\t"
+      end
+    end
+
+    @tag :upstream
+    test "shows added CR" do
+      old = """
+      aaa
+      bbb
+      """
+
+      new = """
+      aaa\r
+      bbb
+      """
+
+      exp = """
+      1   -|aaa
+        1 +|aaa↵
+      2 2  |bbb
+           |
+      """
+
+      assert text_diff_format(old, new)
+      assert text_diff_format(old, new, color: false, before: 1, after: 1) == exp
+    end
+
+    @tag :upstream
+    test "shows multiple added CRs" do
+      old = """
+      aaa
+      bbb
+      """
+
+      new = """
+      aaa\r
+      bbb\r
+      ccc\r
+      """
+
+      exp = """
+      1   -|aaa
+      2   -|bbb
+        1 +|aaa↵
+        2 +|bbb↵
+        3 +|ccc\r
+      """
+
+      assert text_diff_format(old, new)
+      assert text_diff_format(old, new, color: false, before: 1, after: 1) == exp
+    end
+
+    @tag :upstream
+    test "shows deleted CR" do
+      old = """
+      aaa\r
+      bbb
+      """
+
+      new = """
+      aaa
+      bbb
+      """
+
+      exp = """
+      1   -|aaa↵
+        1 +|aaa
+      2 2  |bbb
+           |
+      """
+
+      assert text_diff_format(old, new)
+      assert text_diff_format(old, new, color: false, before: 1, after: 1) == exp
+    end
+
+    @tag :upstream
+    test "shows multiple deleted CRs" do
+      old = """
+      aaa\r
+      bbb\r
+      """
+
+      new = """
+      aaa
+      bbb
+      ccc
+      """
+
+      exp = """
+      1   -|aaa↵
+      2   -|bbb↵
+        1 +|aaa
+        2 +|bbb
+        3 +|ccc
+      """
+
+      assert text_diff_format(old, new)
+      assert text_diff_format(old, new, color: false) == exp
+    end
   end
 end
