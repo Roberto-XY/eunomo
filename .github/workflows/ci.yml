@@ -20,7 +20,7 @@ jobs:
             elixir: "1.15.7"
           - otp: "26.x"
             elixir: "1.16.2"
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
@@ -37,6 +37,9 @@ jobs:
 
       - name: Install Dependencies
         run: mix deps.get
+
+      - name: Compile App
+        run: mix compile
 
       - name: Run formatter
         run: mix format --check-formatted
