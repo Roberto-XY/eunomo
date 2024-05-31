@@ -16,14 +16,14 @@ The package can be installed by adding `eunomo` to your list of dependencies in 
 ```elixir
 def deps do
   [
-    {:eunomo, "~> 2.0.0", only: :dev}
+    {:eunomo, "~> 3.0.0", only: :dev}
   ]
 end
 ```
 
 ## Usage
 
-### Elixir `>= 1.13.0` & version `2.0.0`
+### Elixir `>= 1.13.0` & version `3.0.0`
 
 Uses Elixir formatter [plugin
 system](https://hexdocs.pm/mix/1.13.0/Mix.Tasks.Format.html#module-plugins).
